@@ -38,23 +38,28 @@ public class MainController {
     }
 
     public void showUserManagementView() {
-        new UserManagementView(this).setVisible(true);
+        new UserManagementView(this)
+            .setVisible(true);
     }
 
     public void showReservationRequestView() {
-        new ReservationRequestView(this).setVisible(true);
+        new ReservationRequestView(this)
+            .setVisible(true);
     }
 
     public void showReservationStatusView() {
-        new ReservationStatusView(this).setVisible(true);
+        new ReservationStatusView(this)
+            .setVisible(true);
     }
 
     public void showRoomManagementView() {
-        new RoomManagementView(this).setVisible(true);
+        new RoomManagementView(this)
+            .setVisible(true);
     }
 
     public void showRequestProcessingView() {
-        new RequestProcessingView(this).setVisible(true);
+        new RequestProcessingView(this)
+            .setVisible(true);
     }
 
     // =========================================================
@@ -147,7 +152,8 @@ public class MainController {
     }
 
     public boolean supprimerUser(int id) {
-        String sql = "DELETE FROM User WHERE id = ?";
+        String sql = "DELETE FROM User "
+                   + "WHERE id = ?";
         try {
             PreparedStatement ps =
                 DatabaseManager.getConnection()
@@ -194,13 +200,36 @@ public class MainController {
                                .prepareStatement(sql);
             ps.setString(1, email.trim());
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) return rs.getInt(1) > 0;
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
         } catch (SQLException e) {
             System.err.println(
                 "Erreur emailExiste : "
                 + e.getMessage());
         }
         return false;
+    }
+
+    public String getMotDePasseUser(int id) {
+        String sql = "SELECT mot_de_passe "
+                   + "FROM User WHERE id = ?";
+        try {
+            PreparedStatement ps =
+                DatabaseManager.getConnection()
+                               .prepareStatement(sql);
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getString(
+                    "mot_de_passe");
+            }
+        } catch (SQLException e) {
+            System.err.println(
+                "Erreur getMotDePasseUser : "
+                + e.getMessage());
+        }
+        return "";
     }
 
     // =========================================================
@@ -215,7 +244,8 @@ public class MainController {
         u.setPrenom(rs.getString("prenom"));
         u.setEmail(rs.getString("email"));
         u.setRole(rs.getString("role"));
-        u.setMotDePasse(rs.getString("mot_de_passe"));
+        u.setMotDePasse(
+            rs.getString("mot_de_passe"));
         return u;
     }
 }

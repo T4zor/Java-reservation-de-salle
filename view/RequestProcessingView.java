@@ -1,363 +1,231 @@
 package view;
 
 import controller.MainController;
-import model.User;
-
+import model.Reservation;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.List;
 
-public class LoginView extends JFrame {
+public class RequestProcessingView extends JFrame {
 
     private MainController controller;
+    private DefaultTableModel tableModel;
+    private JTable table;
 
-    // Champs du formulaire
-    private JTextField txtEmail;
-    private JPasswordField txtMotDePasse;
-    private JLabel lblMessage;
+    // =========================================================
+    // CONSTRUCTEUR
+    // =========================================================
 
-    public LoginView(MainController controller) {
+    public RequestProcessingView(
+            MainController controller) {
         this.controller = controller;
 
-        setTitle("Connexion — Réservation de Salles");
-        setSize(420, 520);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setTitle("Traitement des demandes");
+        setSize(850, 480);
         setLocationRelativeTo(null);
-        setResizable(false);
+        setDefaultCloseOperation(
+            JFrame.DISPOSE_ON_CLOSE);
+        setLayout(new BorderLayout(10, 10));
 
-        // Icone
-        try {
-            setIconImage(
-                new ImageIcon("icon/accueil.png").getImage());
-        } catch (Exception e) {
-            System.out.println("Icone non trouvee.");
-        }
+        // ── Titre ─────────────────────────────────────────
+        JPanel topBar = new JPanel(
+            new BorderLayout());
+        topBar.setBackground(
+            new Color(243, 156, 18));
+        topBar.setBorder(
+            BorderFactory.createEmptyBorder(
+                12, 18, 12, 18));
+        JLabel titre = new JLabel(
+            "Traitement des demandes");
+        titre.setFont(
+            new Font("Segoe UI", Font.BOLD, 16));
+        titre.setForeground(Color.WHITE);
+        topBar.add(titre, BorderLayout.WEST);
+        add(topBar, BorderLayout.NORTH);
 
-        // Panel principal
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBackground(Color.WHITE);
-        panel.setBorder(
-            BorderFactory.createEmptyBorder(30, 40, 20, 40));
+        // ── Tableau ───────────────────────────────────────
+        String[] cols = {
+            "ID", "Salle", "Demandeur",
+            "Date debut", "Date fin", "Statut"
+        };
+        tableModel = new DefaultTableModel(
+            cols, 0) {
+            public boolean isCellEditable(
+                    int r, int c) {
+                return false;
+            }
+        };
 
-        // ── Logo / Titre ──────────────────────────────────
-        JLabel lblTitre = new JLabel("Bienvenue !");
-        lblTitre.setFont(new Font("Segoe UI", Font.BOLD, 24));
-        lblTitre.setForeground(new Color(41, 128, 185));
-        lblTitre.setAlignmentX(CENTER_ALIGNMENT);
-        panel.add(lblTitre);
-        panel.add(Box.createVerticalStrut(5));
+        table = new JTable(tableModel);
+        table.setRowHeight(26);
+        table.setFont(
+            new Font("Segoe UI", Font.PLAIN, 12));
+        table.getTableHeader().setFont(
+            new Font("Segoe UI", Font.BOLD, 12));
+        table.setSelectionMode(
+            ListSelectionModel.SINGLE_SELECTION);
+        add(new JScrollPane(table),
+            BorderLayout.CENTER);
 
-        JLabel lblSousTitre = new JLabel(
-            "Connectez-vous pour continuer");
-        lblSousTitre.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        lblSousTitre.setForeground(Color.GRAY);
-        lblSousTitre.setAlignmentX(CENTER_ALIGNMENT);
-        panel.add(lblSousTitre);
-        panel.add(Box.createVerticalStrut(30));
+        // ── Boutons bas ───────────────────────────────────
+        JPanel bas = new JPanel(
+            new FlowLayout(
+                FlowLayout.CENTER, 15, 10));
+        bas.setBackground(
+            new Color(245, 246, 250));
 
-        // ── Separateur ────────────────────────────────────
-        JSeparator sep = new JSeparator();
-        sep.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
-        sep.setForeground(new Color(220, 220, 220));
-        panel.add(sep);
-        panel.add(Box.createVerticalStrut(25));
+        JButton btnAccepter =
+            bouton("Accepter",
+                new Color(39, 174, 96));
+        JButton btnRefuser =
+            bouton("Refuser",
+                new Color(192, 57, 43));
+        JButton btnRetour =
+            bouton("Retour",
+                new Color(52, 73, 94));
 
-        // ── Champ Email ───────────────────────────────────
-        JLabel lblEmail = new JLabel("Adresse email");
-        lblEmail.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        lblEmail.setForeground(new Color(52, 73, 94));
-        lblEmail.setAlignmentX(LEFT_ALIGNMENT);
-        panel.add(lblEmail);
-        panel.add(Box.createVerticalStrut(5));
+        btnAccepter.addActionListener(
+            e -> traiterDemande("acceptee"));
+        btnRefuser.addActionListener(
+            e -> traiterDemande("refusee"));
+        btnRetour.addActionListener(e -> {
+            dispose();
+            controller.showLoginView();
+        });
 
-        txtEmail = new JTextField();
-        txtEmail.setMaximumSize(new Dimension(Integer.MAX_VALUE, 38));
-        txtEmail.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        txtEmail.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(
-                new Color(200, 200, 200), 1),
-            BorderFactory.createEmptyBorder(5, 10, 5, 10)
-        ));
-        txtEmail.setAlignmentX(LEFT_ALIGNMENT);
-        panel.add(txtEmail);
-        panel.add(Box.createVerticalStrut(15));
+        bas.add(btnAccepter);
+        bas.add(btnRefuser);
+        bas.add(btnRetour);
+        add(bas, BorderLayout.SOUTH);
 
-        // ── Champ Mot de passe ────────────────────────────
-        JLabel lblMdp = new JLabel("Mot de passe");
-        lblMdp.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        lblMdp.setForeground(new Color(52, 73, 94));
-        lblMdp.setAlignmentX(LEFT_ALIGNMENT);
-        panel.add(lblMdp);
-        panel.add(Box.createVerticalStrut(5));
-
-        txtMotDePasse = new JPasswordField();
-        txtMotDePasse.setMaximumSize(
-            new Dimension(Integer.MAX_VALUE, 38));
-        txtMotDePasse.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        txtMotDePasse.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(
-                new Color(200, 200, 200), 1),
-            BorderFactory.createEmptyBorder(5, 10, 5, 10)
-        ));
-        txtMotDePasse.setAlignmentX(LEFT_ALIGNMENT);
-        panel.add(txtMotDePasse);
-        panel.add(Box.createVerticalStrut(10));
-
-        // ── Message d'erreur ──────────────────────────────
-        lblMessage = new JLabel(" ");
-        lblMessage.setFont(new Font("Segoe UI", Font.ITALIC, 12));
-        lblMessage.setForeground(Color.RED);
-        lblMessage.setAlignmentX(CENTER_ALIGNMENT);
-        panel.add(lblMessage);
-        panel.add(Box.createVerticalStrut(15));
-
-        // ── Bouton Connexion ──────────────────────────────
-        JButton btnConnexion = new JButton("Se connecter");
-        btnConnexion.setMaximumSize(
-            new Dimension(Integer.MAX_VALUE, 42));
-        btnConnexion.setBackground(new Color(41, 128, 185));
-        btnConnexion.setForeground(Color.WHITE);
-        btnConnexion.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btnConnexion.setFocusPainted(false);
-        btnConnexion.setBorderPainted(false);
-        btnConnexion.setCursor(
-            new Cursor(Cursor.HAND_CURSOR));
-        btnConnexion.setAlignmentX(LEFT_ALIGNMENT);
-        panel.add(btnConnexion);
-        panel.add(Box.createVerticalStrut(15));
-
-        // ── Separateur ────────────────────────────────────
-        JSeparator sep2 = new JSeparator();
-        sep2.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
-        sep2.setForeground(new Color(220, 220, 220));
-        panel.add(sep2);
-        panel.add(Box.createVerticalStrut(15));
-
-        // ── Info roles ────────────────────────────────────
-        JLabel lblInfo = new JLabel(
-            "Roles : etudiant | enseignant | responsable");
-        lblInfo.setFont(new Font("Segoe UI", Font.ITALIC, 11));
-        lblInfo.setForeground(Color.GRAY);
-        lblInfo.setAlignmentX(CENTER_ALIGNMENT);
-        panel.add(lblInfo);
-
-        add(panel);
-
-        // ── Action bouton connexion ───────────────────────
-        btnConnexion.addActionListener(e -> seConnecter());
-
-        // Connexion aussi avec la touche Entree
-        txtMotDePasse.addActionListener(e -> seConnecter());
-        txtEmail.addActionListener(e ->
-            txtMotDePasse.requestFocus());
+        chargerDemandes();
     }
 
-    // ── Logique de connexion ──────────────────────────────
-    private void seConnecter() {
-        String email    = txtEmail.getText().trim();
-        String motDePasse = new String(
-            txtMotDePasse.getPassword()).trim();
+    // =========================================================
+    // CHARGER DEMANDES EN ATTENTE
+    // =========================================================
 
-        // Validation des champs
-        if (email.isEmpty() || motDePasse.isEmpty()) {
-            lblMessage.setText(
-                "Veuillez remplir tous les champs.");
-            lblMessage.setForeground(Color.RED);
+    private void chargerDemandes() {
+        tableModel.setRowCount(0);
+
+        String sql =
+            "SELECT r.id, s.nom AS salle_nom, "
+            + "u.nom || ' ' || u.prenom "
+            + "AS demandeur, "
+            + "r.date_debut, r.date_fin, "
+            + "r.statut "
+            + "FROM Reservation r "
+            + "JOIN Salle s ON r.id_salle = s.id "
+            + "JOIN User u ON r.id_user = u.id "
+            + "WHERE r.statut = 'en attente' "
+            + "ORDER BY r.date_debut";
+
+        try {
+            java.sql.Statement st =
+                model.DatabaseManager
+                     .getConnection()
+                     .createStatement();
+            java.sql.ResultSet rs =
+                st.executeQuery(sql);
+
+            while (rs.next()) {
+                tableModel.addRow(new Object[]{
+                    rs.getInt("id"),
+                    rs.getString("salle_nom"),
+                    rs.getString("demandeur"),
+                    rs.getString("date_debut"),
+                    rs.getString("date_fin"),
+                    rs.getString("statut")
+                });
+            }
+
+            if (tableModel.getRowCount() == 0) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Aucune demande en attente.",
+                    "Information",
+                    JOptionPane
+                        .INFORMATION_MESSAGE);
+            }
+
+        } catch (java.sql.SQLException e) {
+            System.err.println(
+                "Erreur chargement demandes : "
+                + e.getMessage());
+        }
+    }
+
+    // =========================================================
+    // TRAITER UNE DEMANDE
+    // =========================================================
+
+    private void traiterDemande(String statut) {
+        int row = table.getSelectedRow();
+        if (row < 0) {
+            JOptionPane.showMessageDialog(this,
+                "Selectionnez une demande.");
             return;
         }
 
-        // Verification en BD
-        User user = controller.authentifier(email, motDePasse);
+        int id = (int) tableModel
+            .getValueAt(row, 0);
+        String action = statut.equals("acceptee")
+            ? "accepter" : "refuser";
 
-        if (user != null) {
-            // Connexion reussie
-            controller.setUtilisateurConnecte(user);
-            lblMessage.setForeground(new Color(39, 174, 96));
-            lblMessage.setText(
-                "Connexion reussie ! Bienvenue "
-                + user.getNomComplet());
+        int choix = JOptionPane
+            .showConfirmDialog(this,
+                "Voulez-vous " + action
+                + " cette demande ?",
+                "Confirmation",
+                JOptionPane.YES_NO_OPTION);
 
-            // Fermer et ouvrir le menu principal
-            dispose();
-            ouvrirMenuPrincipal(user);
+        if (choix == JOptionPane.YES_OPTION) {
+            String sql =
+                "UPDATE Reservation "
+                + "SET statut = ? "
+                + "WHERE id = ?";
+            try {
+                java.sql.PreparedStatement ps =
+                    model.DatabaseManager
+                         .getConnection()
+                         .prepareStatement(sql);
+                ps.setString(1, statut);
+                ps.setInt(2, id);
 
-        } else {
-            // Echec connexion
-            lblMessage.setForeground(Color.RED);
-            lblMessage.setText(
-                "Email ou mot de passe incorrect.");
-            txtMotDePasse.setText("");
-            txtMotDePasse.requestFocus();
+                if (ps.executeUpdate() > 0) {
+                    JOptionPane
+                        .showMessageDialog(this,
+                            "Demande "
+                            + action
+                            + "e avec succes !");
+                    chargerDemandes();
+                }
+            } catch (java.sql.SQLException e) {
+                System.err.println(
+                    "Erreur traitement : "
+                    + e.getMessage());
+            }
         }
     }
 
-    // ── Redirection selon le role ─────────────────────────
-    private void ouvrirMenuPrincipal(User user) {
-        if (user.isResponsable()) {
-            // Responsable → acces complet
-            ouvrirNavigationComplete();
-        } else {
-            // Etudiant / Enseignant → acces limite
-            ouvrirNavigationLimitee(user);
-        }
-    }
+    // =========================================================
+    // HELPER
+    // =========================================================
 
-    private void ouvrirNavigationComplete() {
-        JFrame menu = new JFrame(
-            "Menu Principal — Responsable");
-        menu.setSize(420, 380);
-        menu.setLocationRelativeTo(null);
-        menu.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        JPanel panel = new JPanel();
-        panel.setLayout(
-            new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBackground(Color.WHITE);
-        panel.setBorder(
-            BorderFactory.createEmptyBorder(20, 30, 20, 30));
-
-        JLabel lbl = new JLabel(
-            "Bienvenue ! Navigation :");
-        lbl.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        lbl.setAlignmentX(CENTER_ALIGNMENT);
-        panel.add(lbl);
-        panel.add(Box.createVerticalStrut(20));
-
-        Dimension btnSize =
-            new Dimension(Integer.MAX_VALUE, 38);
-
-        JButton btnReservation =
-            bouton("Demande de reservation", btnSize,
-                new Color(41, 128, 185));
-        JButton btnStatut =
-            bouton("Statut des reservations", btnSize,
-                new Color(39, 174, 96));
-        JButton btnSalles =
-            bouton("Gestion des salles", btnSize,
-                new Color(142, 68, 173));
-        JButton btnTraitement =
-            bouton("Traitement des demandes", btnSize,
-                new Color(243, 156, 18));
-        JButton btnUsers =
-            bouton("Gestion des utilisateurs", btnSize,
-                new Color(52, 73, 94));
-        JButton btnDeconnexion =
-            bouton("Se deconnecter", btnSize,
-                new Color(192, 57, 43));
-
-        btnReservation.addActionListener(e -> {
-            menu.dispose();
-            controller.showReservationRequestView();
-        });
-        btnStatut.addActionListener(e -> {
-            menu.dispose();
-            controller.showReservationStatusView();
-        });
-        btnSalles.addActionListener(e -> {
-            menu.dispose();
-            controller.showRoomManagementView();
-        });
-        btnTraitement.addActionListener(e -> {
-            menu.dispose();
-            controller.showRequestProcessingView();
-        });
-        btnUsers.addActionListener(e -> {
-            menu.dispose();
-            controller.showUserManagementView();
-        });
-        btnDeconnexion.addActionListener(e -> {
-            menu.dispose();
-            controller.setUtilisateurConnecte(null);
-            controller.showLoginView();
-        });
-
-        panel.add(btnReservation);
-        panel.add(Box.createVerticalStrut(8));
-        panel.add(btnStatut);
-        panel.add(Box.createVerticalStrut(8));
-        panel.add(btnSalles);
-        panel.add(Box.createVerticalStrut(8));
-        panel.add(btnTraitement);
-        panel.add(Box.createVerticalStrut(8));
-        panel.add(btnUsers);
-        panel.add(Box.createVerticalStrut(8));
-        panel.add(btnDeconnexion);
-
-        menu.add(panel);
-        menu.setVisible(true);
-    }
-
-    private void ouvrirNavigationLimitee(User user) {
-        JFrame menu = new JFrame(
-            "Menu — " + user.getNomComplet());
-        menu.setSize(420, 260);
-        menu.setLocationRelativeTo(null);
-        menu.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        JPanel panel = new JPanel();
-        panel.setLayout(
-            new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBackground(Color.WHITE);
-        panel.setBorder(
-            BorderFactory.createEmptyBorder(20, 30, 20, 30));
-
-        JLabel lbl = new JLabel(
-            "Bienvenue " + user.getNomComplet()
-            + " (" + user.getRole() + ")");
-        lbl.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        lbl.setAlignmentX(CENTER_ALIGNMENT);
-        panel.add(lbl);
-        panel.add(Box.createVerticalStrut(20));
-
-        Dimension btnSize =
-            new Dimension(Integer.MAX_VALUE, 38);
-
-        JButton btnReservation =
-            bouton("Demande de reservation", btnSize,
-                new Color(41, 128, 185));
-        JButton btnStatut =
-            bouton("Statut des reservations", btnSize,
-                new Color(39, 174, 96));
-        JButton btnDeconnexion =
-            bouton("Se deconnecter", btnSize,
-                new Color(192, 57, 43));
-
-        btnReservation.addActionListener(e -> {
-            menu.dispose();
-            controller.showReservationRequestView();
-        });
-        btnStatut.addActionListener(e -> {
-            menu.dispose();
-            controller.showReservationStatusView();
-        });
-        btnDeconnexion.addActionListener(e -> {
-            menu.dispose();
-            controller.setUtilisateurConnecte(null);
-            controller.showLoginView();
-        });
-
-        panel.add(btnReservation);
-        panel.add(Box.createVerticalStrut(8));
-        panel.add(btnStatut);
-        panel.add(Box.createVerticalStrut(8));
-        panel.add(btnDeconnexion);
-
-        menu.add(panel);
-        menu.setVisible(true);
-    }
-
-    // ── Helper bouton ─────────────────────────────────────
     private JButton bouton(String texte,
-                            Dimension taille, Color couleur) {
+                            Color couleur) {
         JButton b = new JButton(texte);
-        b.setMaximumSize(taille);
         b.setBackground(couleur);
         b.setForeground(Color.WHITE);
-        b.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        b.setFont(
+            new Font("Segoe UI", Font.BOLD, 13));
         b.setFocusPainted(false);
         b.setBorderPainted(false);
-        b.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        b.setAlignmentX(LEFT_ALIGNMENT);
+        b.setCursor(
+            new Cursor(Cursor.HAND_CURSOR));
+        b.setPreferredSize(
+            new Dimension(130, 38));
         return b;
     }
 }
