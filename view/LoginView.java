@@ -1,459 +1,655 @@
 package view;
 
 import controller.MainController;
+import model.User;
+
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.ActionListener;
 
 public class LoginView extends JFrame {
 
     private MainController controller;
-    private CardLayout cardLayout;
-    private JPanel mainPanel;
+    private JTextField txtEmail;
+    private JPasswordField txtMotDePasse;
+    private JLabel lblMessage;
 
-    private JTextField loginEmailField;
-    private JPasswordField loginPasswordField;
+    // Couleurs
+    private static final Color BLEU
+        = new Color(41, 128, 185);
+    private static final Color BLEU_FONCE
+        = new Color(31, 97, 141);
+    private static final Color VERT
+        = new Color(39, 174, 96);
+    private static final Color ROUGE
+        = new Color(192, 57, 43);
+    private static final Color ORANGE
+        = new Color(243, 156, 18);
+    private static final Color VIOLET
+        = new Color(142, 68, 173);
+    private static final Color GRIS
+        = new Color(52, 73, 94);
+    private static final Color FOND
+        = new Color(245, 246, 250);
 
-    private JTextField nomField, prenomField, emailField;
-    private JTextField numEtudiantField, filiereField;
-    private JTextField departementField, fonctionField;
-    private JComboBox<String> roleCombo, niveauCombo;
-    private JPasswordField passField, confirmField;
-    private CardLayout roleCardLayout;
-    private JPanel rolePanel;
-
-    private static final Color BLUE        = new Color(0x18, 0x5F, 0xA5);
-    private static final Color BLUE_LIGHT  = new Color(0xE6, 0xF1, 0xFB);
-    private static final Color GRAY_TEXT   = new Color(0x88, 0x87, 0x80);
-    private static final Color GRAY_BORDER = new Color(0xD3, 0xD1, 0xC7);
-    private static final Color GRAY_NOTE   = new Color(0xB4, 0xB2, 0xA9);
+    // =========================================================
+    // CONSTRUCTEUR
+    // =========================================================
 
     public LoginView(MainController controller) {
         this.controller = controller;
-        setTitle("Reservation de Salles");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(520, 640);
-        setMinimumSize(new Dimension(420, 540));
-        setResizable(true);
+
+        setTitle("Connexion \u2014 "
+            + "R\u00e9servation de Salles");
+        setSize(440, 560);
+        setDefaultCloseOperation(
+            JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        getContentPane().setBackground(Color.WHITE);
+        setResizable(false);
+
+        try {
+            setIconImage(
+                new ImageIcon("icon/accueil.png")
+                    .getImage());
+        } catch (Exception e) {
+            System.out.println(
+                "Icone non trouvee.");
+        }
+
+        getContentPane()
+            .setBackground(FOND);
         setLayout(new BorderLayout());
-        add(buildHeader(), BorderLayout.NORTH);
-        add(buildCenter(), BorderLayout.CENTER);
-        try { setIconImage(new ImageIcon("icon/accueil.png").getImage()); } catch (Exception ex) {}
+        add(construireHeader(),
+            BorderLayout.NORTH);
+        add(construireFormulaire(),
+            BorderLayout.CENTER);
+        add(construireFooter(),
+            BorderLayout.SOUTH);
     }
 
-    private JPanel buildHeader() {
-        JPanel panel = new JPanel();
-        panel.setBackground(Color.WHITE);
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(BorderFactory.createEmptyBorder(24, 0, 8, 0));
+    // =========================================================
+    // HEADER BLEU
+    // =========================================================
 
-        JPanel icon = new JPanel() {
-            protected void paintComponent(Graphics g) {
+    private JPanel construireHeader() {
+        JPanel header = new JPanel();
+        header.setLayout(
+            new BoxLayout(header,
+                BoxLayout.Y_AXIS));
+        header.setBackground(BLEU);
+        header.setBorder(
+            new EmptyBorder(25, 30, 20, 30));
+
+        // Icone utilisateur
+        JLabel icone = new JLabel() {
+            @Override
+            protected void paintComponent(
+                    Graphics g) {
                 super.paintComponent(g);
-                Graphics2D g2 = (Graphics2D) g;
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(BLUE_LIGHT);
-                g2.fillRoundRect(0, 0, 48, 48, 12, 12);
-                g2.setColor(BLUE);
-                g2.setStroke(new BasicStroke(2.2f));
-                g2.drawRoundRect(10, 10, 28, 28, 4, 4);
-                g2.drawLine(16, 24, 30, 24);
-                g2.drawLine(24, 16, 24, 32);
+                Graphics2D g2 =
+                    (Graphics2D) g;
+                g2.setRenderingHint(
+                    RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints
+                        .VALUE_ANTIALIAS_ON);
+                g2.setColor(
+                    new Color(255,255,255,50));
+                g2.fillOval(0, 0, 50, 50);
+                g2.setColor(Color.WHITE);
+                g2.fillOval(17, 8, 16, 16);
+                g2.fillOval(10, 28, 30, 20);
             }
         };
-        icon.setPreferredSize(new Dimension(48, 48));
-        icon.setMaximumSize(new Dimension(48, 48));
-        icon.setBackground(Color.WHITE);
-        icon.setAlignmentX(Component.CENTER_ALIGNMENT);
+        icone.setPreferredSize(
+            new Dimension(50, 50));
+        icone.setMaximumSize(
+            new Dimension(50, 50));
+        icone.setAlignmentX(
+            CENTER_ALIGNMENT);
 
-        JLabel title = new JLabel("Reservation de salles");
-        title.setFont(new Font("SansSerif", Font.BOLD, 18));
-        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JLabel lblTitre = new JLabel(
+            "Bienvenue !");
+        lblTitre.setFont(
+            new Font("Segoe UI",
+                Font.BOLD, 24));
+        lblTitre.setForeground(Color.WHITE);
+        lblTitre.setAlignmentX(
+            CENTER_ALIGNMENT);
 
-        JLabel subtitle = new JLabel("Connectez-vous a votre compte");
-        subtitle.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        subtitle.setForeground(GRAY_TEXT);
-        subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JLabel lblSous = new JLabel(
+            "Connectez-vous pour continuer");
+        lblSous.setFont(
+            new Font("Segoe UI",
+                Font.PLAIN, 13));
+        lblSous.setForeground(
+            new Color(200, 225, 255));
+        lblSous.setAlignmentX(
+            CENTER_ALIGNMENT);
 
-        panel.add(icon);
+        header.add(icone);
+        header.add(Box.createVerticalStrut(12));
+        header.add(lblTitre);
+        header.add(Box.createVerticalStrut(4));
+        header.add(lblSous);
+
+        return header;
+    }
+
+    // =========================================================
+    // FORMULAIRE
+    // =========================================================
+
+    private JPanel construireFormulaire() {
+        JPanel panel = new JPanel();
+        panel.setLayout(
+            new BoxLayout(panel,
+                BoxLayout.Y_AXIS));
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(
+            new EmptyBorder(25, 35, 20, 35));
+
+        // Email
+        panel.add(creerLabel(
+            "ADRESSE EMAIL"));
+        panel.add(Box.createVerticalStrut(6));
+        txtEmail = new JTextField();
+        styliserChamp(txtEmail,
+            "votre@email.com");
+        panel.add(txtEmail);
+        panel.add(Box.createVerticalStrut(16));
+
+        // Mot de passe
+        panel.add(creerLabel("MOT DE PASSE"));
+        panel.add(Box.createVerticalStrut(6));
+        txtMotDePasse = new JPasswordField();
+        styliserChamp(txtMotDePasse, null);
+        panel.add(txtMotDePasse);
+        panel.add(Box.createVerticalStrut(12));
+
+        // Message erreur/succes
+        lblMessage = new JLabel(" ");
+        lblMessage.setFont(
+            new Font("Segoe UI",
+                Font.ITALIC, 12));
+        lblMessage.setForeground(ROUGE);
+        lblMessage.setAlignmentX(
+            CENTER_ALIGNMENT);
+        panel.add(lblMessage);
+        panel.add(Box.createVerticalStrut(12));
+
+        // Bouton connexion
+        JButton btnConnexion =
+            new JButton("Se connecter");
+        btnConnexion.setMaximumSize(
+            new Dimension(
+                Integer.MAX_VALUE, 44));
+        btnConnexion.setBackground(BLEU);
+        btnConnexion.setForeground(
+            Color.WHITE);
+        btnConnexion.setFont(
+            new Font("Segoe UI",
+                Font.BOLD, 14));
+        btnConnexion.setFocusPainted(false);
+        btnConnexion.setBorderPainted(false);
+        btnConnexion.setCursor(
+            new Cursor(Cursor.HAND_CURSOR));
+        btnConnexion.setAlignmentX(
+            LEFT_ALIGNMENT);
+
+        // Hover effect
+        btnConnexion.addMouseListener(
+            new java.awt.event.MouseAdapter() {
+                public void mouseEntered(
+                        java.awt.event.MouseEvent e) {
+                    btnConnexion
+                        .setBackground(
+                            BLEU_FONCE);
+                }
+                public void mouseExited(
+                        java.awt.event.MouseEvent e) {
+                    btnConnexion
+                        .setBackground(BLEU);
+                }
+            });
+
+        panel.add(btnConnexion);
+        panel.add(Box.createVerticalStrut(20));
+
+        // Separateur
+        JSeparator sep = new JSeparator();
+        sep.setMaximumSize(
+            new Dimension(
+                Integer.MAX_VALUE, 1));
+        sep.setForeground(
+            new Color(220, 220, 220));
+        panel.add(sep);
+        panel.add(Box.createVerticalStrut(15));
+
+        // Roles disponibles
+        JLabel lblRoles = new JLabel(
+            "Roles disponibles :");
+        lblRoles.setFont(
+            new Font("Segoe UI",
+                Font.BOLD, 11));
+        lblRoles.setForeground(
+            new Color(100, 100, 100));
+        lblRoles.setAlignmentX(
+            CENTER_ALIGNMENT);
+        panel.add(lblRoles);
         panel.add(Box.createVerticalStrut(10));
-        panel.add(title);
-        panel.add(Box.createVerticalStrut(4));
-        panel.add(subtitle);
+
+        // Badges des roles
+        JPanel badges = new JPanel(
+            new FlowLayout(
+                FlowLayout.CENTER, 6, 0));
+        badges.setOpaque(false);
+        badges.setMaximumSize(
+            new Dimension(
+                Integer.MAX_VALUE, 30));
+        badges.add(badge(
+            "Etudiant",
+            new Color(230, 241, 251),
+            new Color(12, 68, 124)));
+        badges.add(badge(
+            "Enseignant",
+            new Color(234, 243, 222),
+            new Color(39, 80, 10)));
+        badges.add(badge(
+            "Responsable",
+            new Color(250, 238, 218),
+            new Color(99, 56, 6)));
+        panel.add(badges);
+
+        // Actions
+        btnConnexion.addActionListener(
+            e -> seConnecter());
+        txtMotDePasse.addActionListener(
+            e -> seConnecter());
+        txtEmail.addActionListener(
+            e -> txtMotDePasse
+                .requestFocus());
+
         return panel;
     }
 
-    private JPanel buildCenter() {
-        JButton btnLogin       = makeTabBtn("Connexion",   true);
-        JButton btnInscription = makeTabBtn("Inscription", false);
+    // =========================================================
+    // FOOTER
+    // =========================================================
 
-        JPanel tabBar = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        tabBar.setBackground(Color.WHITE);
-        tabBar.add(btnLogin);
-        tabBar.add(btnInscription);
+    private JPanel construireFooter() {
+        JPanel footer = new JPanel(
+            new FlowLayout(
+                FlowLayout.CENTER));
+        footer.setBackground(FOND);
+        footer.setBorder(
+            new EmptyBorder(8, 0, 8, 0));
 
-        cardLayout = new CardLayout();
-        mainPanel  = new JPanel(cardLayout);
-        mainPanel.setBackground(Color.WHITE);
-        mainPanel.add(buildLoginPanel(),       "LOGIN");
-        mainPanel.add(buildInscriptionPanel(), "INSCRIPTION");
-
-        btnLogin.addActionListener(e -> {
-            cardLayout.show(mainPanel, "LOGIN");
-            setActiveTab(btnLogin, btnInscription);
-        });
-        btnInscription.addActionListener(e -> {
-            cardLayout.show(mainPanel, "INSCRIPTION");
-            setActiveTab(btnInscription, btnLogin);
-        });
-
-        JPanel center = new JPanel(new BorderLayout());
-        center.setBackground(Color.WHITE);
-        center.add(tabBar,    BorderLayout.NORTH);
-        center.add(mainPanel, BorderLayout.CENTER);
-        return center;
+        JLabel lbl = new JLabel(
+            "Acces selon votre role"
+            + " apres connexion");
+        lbl.setFont(
+            new Font("Segoe UI",
+                Font.ITALIC, 11));
+        lbl.setForeground(
+            new Color(150, 150, 150));
+        footer.add(lbl);
+        return footer;
     }
 
-    private JPanel buildLoginPanel() {
-        JPanel outer = new JPanel(new GridBagLayout());
-        outer.setBackground(Color.WHITE);
+    // =========================================================
+    // LOGIQUE CONNEXION
+    // =========================================================
 
-        JPanel inner = new JPanel(new GridBagLayout());
-        inner.setBackground(Color.WHITE);
+    private void seConnecter() {
+        String email =
+            txtEmail.getText().trim();
+        String mdp = new String(
+            txtMotDePasse.getPassword())
+            .trim();
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill      = GridBagConstraints.HORIZONTAL;
-        gbc.weightx   = 1.0;
-        gbc.gridx     = 0;
-        gbc.gridwidth = 2;
-        int row = 0;
-
-        gbc.gridy = row++; gbc.insets = new Insets(0, 0, 2, 0);
-        inner.add(fieldLabel("Email institutionnel"), gbc);
-        gbc.gridy = row++; gbc.insets = new Insets(0, 0, 12, 0);
-        loginEmailField = textField();
-        inner.add(loginEmailField, gbc);
-
-        gbc.gridy = row++; gbc.insets = new Insets(0, 0, 2, 0);
-        inner.add(fieldLabel("Mot de passe"), gbc);
-        gbc.gridy = row++; gbc.insets = new Insets(0, 0, 10, 0);
-        loginPasswordField = passwordField();
-        inner.add(loginPasswordField, gbc);
-
-        gbc.gridy     = row++;
-        gbc.gridwidth = 1;
-        gbc.weightx   = 0.5;
-        gbc.insets    = new Insets(0, 0, 18, 0);
-        JCheckBox remember = new JCheckBox("Se souvenir de moi");
-        remember.setFont(new Font("SansSerif", Font.PLAIN, 12));
-        remember.setForeground(GRAY_TEXT);
-        remember.setBackground(Color.WHITE);
-        gbc.gridx = 0;
-        inner.add(remember, gbc);
-
-        JLabel forgot = new JLabel("<html><u>Mot de passe oublie ?</u></html>");
-        forgot.setFont(new Font("SansSerif", Font.PLAIN, 12));
-        forgot.setForeground(BLUE);
-        forgot.setHorizontalAlignment(SwingConstants.RIGHT);
-        forgot.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        forgot.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent e) {
-                JOptionPane.showMessageDialog(LoginView.this,
-                    "Un email de reinitialisation vous sera envoye.",
-                    "Mot de passe oublie", JOptionPane.INFORMATION_MESSAGE);
-            }
-        });
-        gbc.gridx = 1;
-        inner.add(forgot, gbc);
-
-        gbc.gridx     = 0;
-        gbc.gridwidth = 2;
-        gbc.weightx   = 1.0;
-        gbc.gridy     = row++;
-        gbc.insets    = new Insets(0, 0, 10, 0);
-        JButton btnLogin = primaryButton("Se connecter");
-        btnLogin.addActionListener(e -> handleLogin());
-        inner.add(btnLogin, gbc);
-
-        gbc.gridy  = row++;
-        gbc.insets = new Insets(0, 0, 0, 0);
-        JLabel note = new JLabel("Le role est detecte automatiquement selon votre compte");
-        note.setFont(new Font("SansSerif", Font.PLAIN, 11));
-        note.setForeground(GRAY_NOTE);
-        note.setHorizontalAlignment(SwingConstants.CENTER);
-        inner.add(note, gbc);
-
-        gbc.gridy   = row;
-        gbc.weighty = 1.0;
-        inner.add(new JLabel(), gbc);
-
-        GridBagConstraints o = new GridBagConstraints();
-        o.fill = GridBagConstraints.BOTH; o.weighty = 1.0;
-        o.weightx = 0.15; o.gridx = 0;
-        outer.add(new JPanel() {{ setBackground(Color.WHITE); }}, o);
-        o.weightx = 0.7; o.gridx = 1;
-        outer.add(inner, o);
-        o.weightx = 0.15; o.gridx = 2;
-        outer.add(new JPanel() {{ setBackground(Color.WHITE); }}, o);
-
-        return outer;
-    }
-
-    private JPanel buildInscriptionPanel() {
-        JPanel outer = new JPanel(new GridBagLayout());
-        outer.setBackground(Color.WHITE);
-
-        JPanel inner = new JPanel(new GridBagLayout());
-        inner.setBackground(Color.WHITE);
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill      = GridBagConstraints.HORIZONTAL;
-        gbc.weightx   = 1.0;
-        gbc.gridx     = 0;
-        gbc.gridwidth = 2;
-        int row = 0;
-
-        gbc.gridy = row++; gbc.insets = new Insets(4, 0, 2, 0);
-        inner.add(fieldLabel("Type de compte"), gbc);
-        roleCombo = new JComboBox<>(new String[]{"Etudiant", "Enseignant"});
-        styleCombo(roleCombo);
-        gbc.gridy = row++; gbc.insets = new Insets(0, 0, 12, 0);
-        inner.add(roleCombo, gbc);
-
-        gbc.gridy = row++; gbc.gridwidth = 1; gbc.weightx = 0.5;
-        gbc.gridx = 0; gbc.insets = new Insets(0, 0, 2, 4);
-        nomField = textField();
-        inner.add(fieldLabel("Nom"), gbc);
-        gbc.gridx = 1; gbc.insets = new Insets(0, 4, 2, 0);
-        prenomField = textField();
-        inner.add(fieldLabel("Prenom"), gbc);
-
-        gbc.gridy = row++;
-        gbc.gridx = 0; gbc.insets = new Insets(0, 0, 12, 4);
-        inner.add(nomField, gbc);
-        gbc.gridx = 1; gbc.insets = new Insets(0, 4, 12, 0);
-        inner.add(prenomField, gbc);
-
-        gbc.gridx = 0; gbc.gridwidth = 2; gbc.weightx = 1.0;
-        gbc.gridy = row++; gbc.insets = new Insets(0, 0, 2, 0);
-        inner.add(fieldLabel("Email institutionnel"), gbc);
-        emailField = textField();
-        gbc.gridy = row++; gbc.insets = new Insets(0, 0, 12, 0);
-        inner.add(emailField, gbc);
-
-        roleCardLayout = new CardLayout();
-        rolePanel = new JPanel(roleCardLayout);
-        rolePanel.setBackground(Color.WHITE);
-        rolePanel.add(buildEtudiantFields(),   "ETUDIANT");
-        rolePanel.add(buildEnseignantFields(), "ENSEIGNANT");
-        gbc.gridy = row++; gbc.insets = new Insets(0, 0, 12, 0);
-        inner.add(rolePanel, gbc);
-
-        gbc.gridy = row++; gbc.gridwidth = 1; gbc.weightx = 0.5;
-        passField = passwordField(); confirmField = passwordField();
-        gbc.gridx = 0; gbc.insets = new Insets(0, 0, 2, 4);
-        inner.add(fieldLabel("Mot de passe"), gbc);
-        gbc.gridx = 1; gbc.insets = new Insets(0, 4, 2, 0);
-        inner.add(fieldLabel("Confirmer"), gbc);
-
-        gbc.gridy = row++;
-        gbc.gridx = 0; gbc.insets = new Insets(0, 0, 18, 4);
-        inner.add(passField, gbc);
-        gbc.gridx = 1; gbc.insets = new Insets(0, 4, 18, 0);
-        inner.add(confirmField, gbc);
-
-        gbc.gridx = 0; gbc.gridwidth = 2; gbc.weightx = 1.0;
-        gbc.gridy = row++; gbc.insets = new Insets(0, 0, 10, 0);
-        JButton btnCreer = primaryButton("Creer mon compte");
-        btnCreer.addActionListener(e -> handleInscription());
-        inner.add(btnCreer, gbc);
-
-        gbc.gridy = row++; gbc.insets = new Insets(0, 0, 0, 0);
-        JLabel note = new JLabel("Les comptes responsables sont crees par l'administrateur");
-        note.setFont(new Font("SansSerif", Font.PLAIN, 11));
-        note.setForeground(GRAY_NOTE);
-        note.setHorizontalAlignment(SwingConstants.CENTER);
-        inner.add(note, gbc);
-
-        gbc.gridy = row; gbc.weighty = 1.0;
-        inner.add(new JLabel(), gbc);
-
-        roleCombo.addActionListener(e -> {
-            String sel = (String) roleCombo.getSelectedItem();
-            roleCardLayout.show(rolePanel, "Etudiant".equals(sel) ? "ETUDIANT" : "ENSEIGNANT");
-        });
-
-        GridBagConstraints o = new GridBagConstraints();
-        o.fill = GridBagConstraints.BOTH; o.weighty = 1.0;
-        o.weightx = 0.1; o.gridx = 0;
-        outer.add(new JPanel() {{ setBackground(Color.WHITE); }}, o);
-        o.weightx = 0.8; o.gridx = 1;
-        outer.add(inner, o);
-        o.weightx = 0.1; o.gridx = 2;
-        outer.add(new JPanel() {{ setBackground(Color.WHITE); }}, o);
-
-        return outer;
-    }
-
-    private JPanel buildEtudiantFields() {
-        JPanel p = new JPanel(new GridBagLayout());
-        p.setBackground(Color.WHITE);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 0.5; gbc.gridy = 0;
-
-        filiereField = textField();
-        niveauCombo  = new JComboBox<>(new String[]{"Licence 1","Licence 2","Licence 3","Master 1","Master 2"});
-        styleCombo(niveauCombo);
-
-        gbc.gridx = 0; gbc.insets = new Insets(0, 0, 2, 6);
-        p.add(fieldLabel("Filiere"), gbc);
-        gbc.gridx = 1; gbc.insets = new Insets(0, 6, 2, 0);
-        p.add(fieldLabel("Niveau"), gbc);
-
-        gbc.gridy = 1;
-        gbc.gridx = 0; gbc.insets = new Insets(0, 0, 10, 6);
-        p.add(filiereField, gbc);
-        gbc.gridx = 1; gbc.insets = new Insets(0, 6, 10, 0);
-        p.add(niveauCombo, gbc);
-
-        gbc.gridy = 2; gbc.gridx = 0; gbc.gridwidth = 2; gbc.weightx = 1.0;
-        gbc.insets = new Insets(0, 0, 2, 0);
-        p.add(fieldLabel("Numero etudiant"), gbc);
-
-        gbc.gridy = 3; gbc.insets = new Insets(0, 0, 0, 0);
-        numEtudiantField = textField();
-        p.add(numEtudiantField, gbc);
-        return p;
-    }
-
-    private JPanel buildEnseignantFields() {
-        JPanel p = new JPanel(new GridBagLayout());
-        p.setBackground(Color.WHITE);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 1.0; gbc.gridx = 0;
-
-        gbc.gridy = 0; gbc.insets = new Insets(0, 0, 2, 0);
-        p.add(fieldLabel("Departement"), gbc);
-        gbc.gridy = 1; gbc.insets = new Insets(0, 0, 10, 0);
-        departementField = textField();
-        p.add(departementField, gbc);
-
-        gbc.gridy = 2; gbc.insets = new Insets(0, 0, 2, 0);
-        p.add(fieldLabel("Fonction"), gbc);
-        gbc.gridy = 3; gbc.insets = new Insets(0, 0, 0, 0);
-        fonctionField = textField();
-        p.add(fonctionField, gbc);
-        return p;
-    }
-
-    private void handleLogin() {
-        String email = loginEmailField.getText().trim();
-        String pass  = new String(loginPasswordField.getPassword()).trim();
-        if (email.isEmpty() || pass.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Veuillez remplir tous les champs.",
-                "Erreur", JOptionPane.ERROR_MESSAGE);
+        if (email.isEmpty()
+                || mdp.isEmpty()) {
+            afficherErreur(
+                "Veuillez remplir "
+                + "tous les champs.");
             return;
         }
-        dispose();
-        controller.showReservationRequestView();
-    }
 
-    private void handleInscription() {
-        String nom    = nomField.getText().trim();
-        String prenom = prenomField.getText().trim();
-        String email  = emailField.getText().trim();
-        String pass   = new String(passField.getPassword());
-        String confirm = new String(confirmField.getPassword());
-        if (nom.isEmpty() || prenom.isEmpty() || email.isEmpty() || pass.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Veuillez remplir tous les champs.",
-                "Erreur", JOptionPane.ERROR_MESSAGE);
-            return;
+        User user =
+            controller.authentifier(
+                email, mdp);
+
+        if (user != null) {
+            controller
+                .setUtilisateurConnecte(user);
+            afficherSucces(
+                "Connexion reussie ! "
+                + "Bienvenue "
+                + user.getNomComplet());
+            dispose();
+            ouvrirMenuSelonRole(user);
+        } else {
+            afficherErreur(
+                "Email ou mot de passe "
+                + "incorrect.");
+            txtMotDePasse.setText("");
+            txtMotDePasse.requestFocus();
         }
-        if (!pass.equals(confirm)) {
-            JOptionPane.showMessageDialog(this, "Les mots de passe ne correspondent pas.",
-                "Erreur", JOptionPane.ERROR_MESSAGE);
-            return;
+    }
+
+    // =========================================================
+    // MENUS SELON LE ROLE
+    // =========================================================
+
+    private void ouvrirMenuSelonRole(
+            User user) {
+        if (user.isResponsable()) {
+            ouvrirMenuResponsable(user);
+        } else if (user.isEnseignant()) {
+            ouvrirMenuEnseignant(user);
+        } else {
+            ouvrirMenuEtudiant(user);
         }
-        JOptionPane.showMessageDialog(this, "Compte cree avec succes !",
-            "Succes", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    private JTextField textField() {
-        JTextField f = new JTextField();
-        f.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        f.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(GRAY_BORDER, 1),
-            BorderFactory.createEmptyBorder(8, 12, 8, 12)));
-        return f;
+    private void ouvrirMenuResponsable(
+            User user) {
+        JFrame menu = creerFenetreMenu(
+            "Menu Responsable \u2014 "
+            + user.getNomComplet(),
+            420, 430);
+
+        JPanel panel = creerPanelMenu(
+            user, "Responsable", ORANGE);
+
+        ajouterBouton(panel,
+            "Demande de r\u00e9servation",
+            BLEU, e -> {
+                menu.dispose();
+                controller
+                    .showReservationRequestView();
+            });
+        ajouterBouton(panel,
+            "Statut des r\u00e9servations",
+            VERT, e -> {
+                menu.dispose();
+                controller
+                    .showReservationStatusView();
+            });
+        ajouterBouton(panel,
+            "Gestion des salles",
+            VIOLET, e -> {
+                menu.dispose();
+                controller
+                    .showRoomManagementView();
+            });
+        ajouterBouton(panel,
+            "Traitement des demandes",
+            ORANGE, e -> {
+                menu.dispose();
+                controller
+                    .showRequestProcessingView();
+            });
+        ajouterBouton(panel,
+            "Gestion des utilisateurs",
+            GRIS, e -> {
+                menu.dispose();
+                controller
+                    .showUserManagementView();
+            });
+        ajouterBouton(panel,
+            "Se d\u00e9connecter",
+            ROUGE, e -> {
+                menu.dispose();
+                controller
+                    .setUtilisateurConnecte(
+                        null);
+                controller.showLoginView();
+            });
+
+        menu.add(panel);
+        menu.setVisible(true);
     }
 
-    private JPasswordField passwordField() {
-        JPasswordField f = new JPasswordField();
-        f.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        f.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(GRAY_BORDER, 1),
-            BorderFactory.createEmptyBorder(8, 12, 8, 12)));
-        return f;
+    private void ouvrirMenuEnseignant(
+            User user) {
+        JFrame menu = creerFenetreMenu(
+            "Menu Enseignant \u2014 "
+            + user.getNomComplet(),
+            420, 290);
+
+        JPanel panel = creerPanelMenu(
+            user, "Enseignant", VERT);
+
+        ajouterBouton(panel,
+            "Demande de r\u00e9servation",
+            BLEU, e -> {
+                menu.dispose();
+                controller
+                    .showReservationRequestView();
+            });
+        ajouterBouton(panel,
+            "Statut des r\u00e9servations",
+            VERT, e -> {
+                menu.dispose();
+                controller
+                    .showReservationStatusView();
+            });
+        ajouterBouton(panel,
+            "Se d\u00e9connecter",
+            ROUGE, e -> {
+                menu.dispose();
+                controller
+                    .setUtilisateurConnecte(
+                        null);
+                controller.showLoginView();
+            });
+
+        menu.add(panel);
+        menu.setVisible(true);
     }
 
-    private JLabel fieldLabel(String text) {
-        JLabel l = new JLabel(text);
-        l.setFont(new Font("SansSerif", Font.PLAIN, 12));
-        l.setForeground(GRAY_TEXT);
-        l.setHorizontalAlignment(SwingConstants.LEFT);
+    private void ouvrirMenuEtudiant(
+            User user) {
+        JFrame menu = creerFenetreMenu(
+            "Menu Etudiant \u2014 "
+            + user.getNomComplet(),
+            420, 290);
+
+        JPanel panel = creerPanelMenu(
+            user, "Etudiant", BLEU);
+
+        ajouterBouton(panel,
+            "Demande de r\u00e9servation",
+            BLEU, e -> {
+                menu.dispose();
+                controller
+                    .showReservationRequestView();
+            });
+        ajouterBouton(panel,
+            "Statut de mes r\u00e9servations",
+            VERT, e -> {
+                menu.dispose();
+                controller
+                    .showReservationStatusView();
+            });
+        ajouterBouton(panel,
+            "Se d\u00e9connecter",
+            ROUGE, e -> {
+                menu.dispose();
+                controller
+                    .setUtilisateurConnecte(
+                        null);
+                controller.showLoginView();
+            });
+
+        menu.add(panel);
+        menu.setVisible(true);
+    }
+
+    // =========================================================
+    // HELPERS INTERFACE
+    // =========================================================
+
+    private JFrame creerFenetreMenu(
+            String titre, int w, int h) {
+        JFrame menu = new JFrame(titre);
+        menu.setSize(w, h);
+        menu.setLocationRelativeTo(null);
+        menu.setDefaultCloseOperation(
+            JFrame.EXIT_ON_CLOSE);
+        return menu;
+    }
+
+    private JPanel creerPanelMenu(
+            User user, String role,
+            Color couleurRole) {
+        JPanel panel = new JPanel();
+        panel.setLayout(
+            new BoxLayout(panel,
+                BoxLayout.Y_AXIS));
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(
+            new EmptyBorder(20, 30, 20, 30));
+
+        JLabel lblNom = new JLabel(
+            "Bienvenue, "
+            + user.getNomComplet());
+        lblNom.setFont(
+            new Font("Segoe UI",
+                Font.BOLD, 15));
+        lblNom.setForeground(
+            new Color(52, 73, 94));
+        lblNom.setAlignmentX(
+            CENTER_ALIGNMENT);
+
+        JLabel lblRole = new JLabel(role);
+        lblRole.setFont(
+            new Font("Segoe UI",
+                Font.BOLD, 11));
+        lblRole.setForeground(couleurRole);
+        lblRole.setAlignmentX(
+            CENTER_ALIGNMENT);
+
+        panel.add(lblNom);
+        panel.add(Box.createVerticalStrut(4));
+        panel.add(lblRole);
+        panel.add(Box.createVerticalStrut(18));
+
+        JSeparator sep = new JSeparator();
+        sep.setMaximumSize(
+            new Dimension(
+                Integer.MAX_VALUE, 1));
+        sep.setForeground(
+            new Color(220, 220, 220));
+        panel.add(sep);
+        panel.add(Box.createVerticalStrut(15));
+
+        return panel;
+    }
+
+    private void ajouterBouton(
+            JPanel panel, String texte,
+            Color couleur,
+            ActionListener action) {
+        JButton b = new JButton(texte);
+        b.setMaximumSize(
+            new Dimension(
+                Integer.MAX_VALUE, 38));
+        b.setBackground(couleur);
+        b.setForeground(Color.WHITE);
+        b.setFont(
+            new Font("Segoe UI",
+                Font.BOLD, 12));
+        b.setFocusPainted(false);
+        b.setBorderPainted(false);
+        b.setCursor(
+            new Cursor(Cursor.HAND_CURSOR));
+        b.setAlignmentX(LEFT_ALIGNMENT);
+        b.addActionListener(action);
+        panel.add(b);
+        panel.add(
+            Box.createVerticalStrut(8));
+    }
+
+    private JLabel creerLabel(
+            String texte) {
+        JLabel l = new JLabel(texte);
+        l.setFont(
+            new Font("Segoe UI",
+                Font.BOLD, 11));
+        l.setForeground(
+            new Color(100, 100, 100));
+        l.setAlignmentX(LEFT_ALIGNMENT);
         return l;
     }
 
-    private JButton primaryButton(String text) {
-        JButton b = new JButton(text);
-        b.setFont(new Font("SansSerif", Font.BOLD, 14));
-        b.setBackground(BLUE);
-        b.setForeground(Color.WHITE);
-        b.setFocusPainted(false);
-        b.setBorderPainted(false);
-        b.setOpaque(true);
-        b.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        b.setPreferredSize(new Dimension(0, 44));
-        b.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent e) { b.setBackground(new Color(0x0C,0x44,0x7C)); }
-            public void mouseExited(java.awt.event.MouseEvent e)  { b.setBackground(BLUE); }
-        });
-        return b;
+    private void styliserChamp(
+            JTextField champ,
+            String placeholder) {
+        champ.setMaximumSize(
+            new Dimension(
+                Integer.MAX_VALUE, 40));
+        champ.setFont(
+            new Font("Segoe UI",
+                Font.PLAIN, 13));
+        champ.setBorder(
+            BorderFactory.createCompoundBorder(
+                BorderFactory
+                    .createLineBorder(
+                        new Color(
+                            200, 200, 200), 1),
+                BorderFactory
+                    .createEmptyBorder(
+                        6, 12, 6, 12)));
+        champ.setAlignmentX(LEFT_ALIGNMENT);
+        champ.setBackground(
+            new Color(250, 251, 252));
     }
 
-    private JButton makeTabBtn(String text, boolean active) {
-        JButton b = new JButton(text);
-        b.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        b.setFocusPainted(false);
-        b.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        b.setPreferredSize(new Dimension(140, 36));
-        b.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(BLUE, 1, true),
-            BorderFactory.createEmptyBorder(6, 20, 6, 20)));
-        b.setOpaque(true);
-        if (active) { b.setBackground(BLUE); b.setForeground(Color.WHITE); }
-        else        { b.setBackground(Color.WHITE); b.setForeground(BLUE); }
-        return b;
+    private JLabel badge(
+            String texte, Color fond,
+            Color texteColor) {
+        JLabel l = new JLabel(texte) {
+            @Override
+            protected void paintComponent(
+                    Graphics g) {
+                Graphics2D g2 =
+                    (Graphics2D) g;
+                g2.setRenderingHint(
+                    RenderingHints
+                        .KEY_ANTIALIASING,
+                    RenderingHints
+                        .VALUE_ANTIALIAS_ON);
+                g2.setColor(fond);
+                g2.fillRoundRect(
+                    0, 0,
+                    getWidth(),
+                    getHeight(),
+                    20, 20);
+                super.paintComponent(g);
+            }
+        };
+        l.setFont(
+            new Font("Segoe UI",
+                Font.BOLD, 11));
+        l.setForeground(texteColor);
+        l.setOpaque(false);
+        l.setBorder(
+            new EmptyBorder(4, 12, 4, 12));
+        return l;
     }
 
-    private void setActiveTab(JButton active, JButton inactive) {
-        active.setBackground(BLUE);          active.setForeground(Color.WHITE);
-        inactive.setBackground(Color.WHITE); inactive.setForeground(BLUE);
+    private void afficherErreur(
+            String msg) {
+        lblMessage.setForeground(ROUGE);
+        lblMessage.setText(msg);
     }
 
-    private void styleCombo(JComboBox<?> combo) {
-        combo.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        combo.setBorder(BorderFactory.createLineBorder(GRAY_BORDER, 1));
-    }
-
-    // TODO: enlever cette methode main quand tout sera fini
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            MainController controller = new MainController();
-            new LoginView(controller).setVisible(true);
-        });
+    private void afficherSucces(
+            String msg) {
+        lblMessage.setForeground(VERT);
+        lblMessage.setText(msg);
     }
 }
