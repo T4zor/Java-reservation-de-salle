@@ -1,19 +1,21 @@
 package view;
 
+import controller.MainController;
 import javax.swing.*;
 
 public class RoomManagementView extends JFrame {
-    public RoomManagementView() {
+
+    private MainController controller;
+
+    public RoomManagementView(MainController controller) {
+        this.controller = controller;
         setTitle("Gestion des salles");
-        setSize(500, 300);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setSize(600, 400);
         setLocationRelativeTo(null);
-        // Ajouter ici les composants (ajout, modification, suppression...)
-         //icone
-        try {
-            setIconImage(new ImageIcon("icon/accueil.png").getImage());
-        } catch (Exception ex) {
-            System.out.println("Icône non trouvée ou non supportée.");
-        }
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JLabel label = new JLabel(
+            "Vue en cours de développement...", JLabel.CENTER);
+        add(label);
     }
 }

@@ -1,6 +1,8 @@
 package controller;
 
 import database.DBConnection;
+import model.Reservation;
+import model.Room;
 import model.User;
 import view.*;
 
@@ -18,8 +20,7 @@ public class MainController {
     // =========================================================
 
     public void start() {
-        LoginView loginView = new LoginView(this);
-        loginView.setVisible(true);
+        showLoginView(); // ✅ évite la duplication
     }
 
     public void showLoginView() {
@@ -28,22 +29,22 @@ public class MainController {
     }
 
     public void showReservationRequestView() {
-        ReservationRequestView view = new ReservationRequestView();
+        ReservationRequestView view = new ReservationRequestView(this); // ✅ this ajouté
         view.setVisible(true);
     }
 
     public void showReservationStatusView() {
-        ReservationStatusView view = new ReservationStatusView();
+        ReservationStatusView view = new ReservationStatusView(this); // ✅ this ajouté
         view.setVisible(true);
     }
 
     public void showRoomManagementView() {
-        RoomManagementView view = new RoomManagementView();
+        RoomManagementView view = new RoomManagementView(this); // ✅ this ajouté
         view.setVisible(true);
     }
 
     public void showRequestProcessingView() {
-        RequestProcessingView view = new RequestProcessingView();
+        RequestProcessingView view = new RequestProcessingView(this); // ✅ this ajouté
         view.setVisible(true);
     }
 
