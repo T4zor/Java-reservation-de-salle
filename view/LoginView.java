@@ -29,21 +29,16 @@ public class LoginView extends JFrame {
 
     public LoginView(MainController controller) {
         this.controller = controller;
-
         setTitle("Reservation de Salles");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        // Taille fixe — ne change JAMAIS
-        setSize(500, 620);
+        setSize(520, 640);
+        setMinimumSize(new Dimension(420, 540));
         setResizable(true);
         setLocationRelativeTo(null);
-
         getContentPane().setBackground(Color.WHITE);
         setLayout(new BorderLayout());
-
         add(buildHeader(), BorderLayout.NORTH);
         add(buildCenter(), BorderLayout.CENTER);
-
         try { setIconImage(new ImageIcon("icon/accueil.png").getImage()); } catch (Exception ex) {}
     }
 
@@ -90,7 +85,6 @@ public class LoginView extends JFrame {
     }
 
     private JPanel buildCenter() {
-        // Onglets — taille fixe pour les deux boutons
         JButton btnLogin       = makeTabBtn("Connexion",   true);
         JButton btnInscription = makeTabBtn("Inscription", false);
 
@@ -99,20 +93,12 @@ public class LoginView extends JFrame {
         tabBar.add(btnLogin);
         tabBar.add(btnInscription);
 
-        // CardLayout — les deux panneaux ont la MEME taille
         cardLayout = new CardLayout();
         mainPanel  = new JPanel(cardLayout);
         mainPanel.setBackground(Color.WHITE);
+        mainPanel.add(buildLoginPanel(),       "LOGIN");
+        mainPanel.add(buildInscriptionPanel(), "INSCRIPTION");
 
-        // Les deux panneaux sont dans un JScrollPane
-        // pour que le contenu ne déborde jamais
-        JScrollPane scrollLogin = scrollWrap(buildLoginPanel());
-        JScrollPane scrollInsc  = scrollWrap(buildInscriptionPanel());
-
-        mainPanel.add(scrollLogin, "LOGIN");
-        mainPanel.add(scrollInsc,  "INSCRIPTION");
-
-        // Les onglets NE changent PAS la taille de la fenetre
         btnLogin.addActionListener(e -> {
             cardLayout.show(mainPanel, "LOGIN");
             setActiveTab(btnLogin, btnInscription);
@@ -129,45 +115,47 @@ public class LoginView extends JFrame {
         return center;
     }
 
-    // Wrapping dans ScrollPane sans bordure visible
-    private JScrollPane scrollWrap(JPanel content) {
-        content.setBorder(BorderFactory.createEmptyBorder(4, 40, 20, 40));
-        JScrollPane sp = new JScrollPane(content);
-        sp.setBorder(null);
-        sp.getVerticalScrollBar().setUnitIncrement(14);
-        sp.setBackground(Color.WHITE);
-        sp.getViewport().setBackground(Color.WHITE);
-        sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        return sp;
-    }
-
     private JPanel buildLoginPanel() {
-        JPanel p = vbox();
+        JPanel outer = new JPanel(new GridBagLayout());
+        outer.setBackground(Color.WHITE);
 
-        p.add(fieldLabel("Email institutionnel"));
-        p.add(Box.createVerticalStrut(5));
+        JPanel inner = new JPanel(new GridBagLayout());
+        inner.setBackground(Color.WHITE);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill      = GridBagConstraints.HORIZONTAL;
+        gbc.weightx   = 1.0;
+        gbc.gridx     = 0;
+        gbc.gridwidth = 2;
+        int row = 0;
+
+        gbc.gridy = row++; gbc.insets = new Insets(0, 0, 2, 0);
+        inner.add(fieldLabel("Email institutionnel"), gbc);
+        gbc.gridy = row++; gbc.insets = new Insets(0, 0, 12, 0);
         loginEmailField = textField();
-        p.add(loginEmailField);
-        p.add(Box.createVerticalStrut(14));
+        inner.add(loginEmailField, gbc);
 
-        p.add(fieldLabel("Mot de passe"));
-        p.add(Box.createVerticalStrut(5));
+        gbc.gridy = row++; gbc.insets = new Insets(0, 0, 2, 0);
+        inner.add(fieldLabel("Mot de passe"), gbc);
+        gbc.gridy = row++; gbc.insets = new Insets(0, 0, 10, 0);
         loginPasswordField = passwordField();
-        p.add(loginPasswordField);
-        p.add(Box.createVerticalStrut(12));
+        inner.add(loginPasswordField, gbc);
 
-        JPanel row = new JPanel(new BorderLayout());
-        row.setBackground(Color.WHITE);
-        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
-
+        gbc.gridy     = row++;
+        gbc.gridwidth = 1;
+        gbc.weightx   = 0.5;
+        gbc.insets    = new Insets(0, 0, 18, 0);
         JCheckBox remember = new JCheckBox("Se souvenir de moi");
         remember.setFont(new Font("SansSerif", Font.PLAIN, 12));
         remember.setForeground(GRAY_TEXT);
         remember.setBackground(Color.WHITE);
+        gbc.gridx = 0;
+        inner.add(remember, gbc);
 
         JLabel forgot = new JLabel("<html><u>Mot de passe oublie ?</u></html>");
         forgot.setFont(new Font("SansSerif", Font.PLAIN, 12));
         forgot.setForeground(BLUE);
+        forgot.setHorizontalAlignment(SwingConstants.RIGHT);
         forgot.setCursor(new Cursor(Cursor.HAND_CURSOR));
         forgot.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent e) {
@@ -176,102 +164,188 @@ public class LoginView extends JFrame {
                     "Mot de passe oublie", JOptionPane.INFORMATION_MESSAGE);
             }
         });
-        row.add(remember, BorderLayout.WEST);
-        row.add(forgot,   BorderLayout.EAST);
-        p.add(row);
-        p.add(Box.createVerticalStrut(22));
+        gbc.gridx = 1;
+        inner.add(forgot, gbc);
 
-        JButton btn = primaryButton("Se connecter");
-        btn.addActionListener(e -> handleLogin());
-        p.add(btn);
-        p.add(Box.createVerticalStrut(12));
+        gbc.gridx     = 0;
+        gbc.gridwidth = 2;
+        gbc.weightx   = 1.0;
+        gbc.gridy     = row++;
+        gbc.insets    = new Insets(0, 0, 10, 0);
+        JButton btnLogin = primaryButton("Se connecter");
+        btnLogin.addActionListener(e -> handleLogin());
+        inner.add(btnLogin, gbc);
 
+        gbc.gridy  = row++;
+        gbc.insets = new Insets(0, 0, 0, 0);
         JLabel note = new JLabel("Le role est detecte automatiquement selon votre compte");
         note.setFont(new Font("SansSerif", Font.PLAIN, 11));
         note.setForeground(GRAY_NOTE);
-        note.setAlignmentX(Component.CENTER_ALIGNMENT);
-        p.add(note);
-        return p;
+        note.setHorizontalAlignment(SwingConstants.CENTER);
+        inner.add(note, gbc);
+
+        gbc.gridy   = row;
+        gbc.weighty = 1.0;
+        inner.add(new JLabel(), gbc);
+
+        GridBagConstraints o = new GridBagConstraints();
+        o.fill = GridBagConstraints.BOTH; o.weighty = 1.0;
+        o.weightx = 0.15; o.gridx = 0;
+        outer.add(new JPanel() {{ setBackground(Color.WHITE); }}, o);
+        o.weightx = 0.7; o.gridx = 1;
+        outer.add(inner, o);
+        o.weightx = 0.15; o.gridx = 2;
+        outer.add(new JPanel() {{ setBackground(Color.WHITE); }}, o);
+
+        return outer;
     }
 
     private JPanel buildInscriptionPanel() {
-        JPanel p = vbox();
+        JPanel outer = new JPanel(new GridBagLayout());
+        outer.setBackground(Color.WHITE);
 
-        p.add(fieldLabel("Type de compte"));
-        p.add(Box.createVerticalStrut(5));
+        JPanel inner = new JPanel(new GridBagLayout());
+        inner.setBackground(Color.WHITE);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill      = GridBagConstraints.HORIZONTAL;
+        gbc.weightx   = 1.0;
+        gbc.gridx     = 0;
+        gbc.gridwidth = 2;
+        int row = 0;
+
+        gbc.gridy = row++; gbc.insets = new Insets(4, 0, 2, 0);
+        inner.add(fieldLabel("Type de compte"), gbc);
         roleCombo = new JComboBox<>(new String[]{"Etudiant", "Enseignant"});
         styleCombo(roleCombo);
-        p.add(roleCombo);
-        p.add(Box.createVerticalStrut(14));
+        gbc.gridy = row++; gbc.insets = new Insets(0, 0, 12, 0);
+        inner.add(roleCombo, gbc);
 
-        nomField    = textField();
+        gbc.gridy = row++; gbc.gridwidth = 1; gbc.weightx = 0.5;
+        gbc.gridx = 0; gbc.insets = new Insets(0, 0, 2, 4);
+        nomField = textField();
+        inner.add(fieldLabel("Nom"), gbc);
+        gbc.gridx = 1; gbc.insets = new Insets(0, 4, 2, 0);
         prenomField = textField();
-        p.add(row2(labeled("Nom", nomField), labeled("Prenom", prenomField)));
-        p.add(Box.createVerticalStrut(14));
+        inner.add(fieldLabel("Prenom"), gbc);
 
-        p.add(fieldLabel("Email institutionnel"));
-        p.add(Box.createVerticalStrut(5));
+        gbc.gridy = row++;
+        gbc.gridx = 0; gbc.insets = new Insets(0, 0, 12, 4);
+        inner.add(nomField, gbc);
+        gbc.gridx = 1; gbc.insets = new Insets(0, 4, 12, 0);
+        inner.add(prenomField, gbc);
+
+        gbc.gridx = 0; gbc.gridwidth = 2; gbc.weightx = 1.0;
+        gbc.gridy = row++; gbc.insets = new Insets(0, 0, 2, 0);
+        inner.add(fieldLabel("Email institutionnel"), gbc);
         emailField = textField();
-        p.add(emailField);
-        p.add(Box.createVerticalStrut(14));
+        gbc.gridy = row++; gbc.insets = new Insets(0, 0, 12, 0);
+        inner.add(emailField, gbc);
 
         roleCardLayout = new CardLayout();
         rolePanel = new JPanel(roleCardLayout);
         rolePanel.setBackground(Color.WHITE);
-        rolePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
         rolePanel.add(buildEtudiantFields(),   "ETUDIANT");
         rolePanel.add(buildEnseignantFields(), "ENSEIGNANT");
-        p.add(rolePanel);
-        p.add(Box.createVerticalStrut(14));
+        gbc.gridy = row++; gbc.insets = new Insets(0, 0, 12, 0);
+        inner.add(rolePanel, gbc);
 
-        passField    = passwordField();
-        confirmField = passwordField();
-        p.add(row2(labeled("Mot de passe", passField), labeled("Confirmer", confirmField)));
-        p.add(Box.createVerticalStrut(22));
+        gbc.gridy = row++; gbc.gridwidth = 1; gbc.weightx = 0.5;
+        passField = passwordField(); confirmField = passwordField();
+        gbc.gridx = 0; gbc.insets = new Insets(0, 0, 2, 4);
+        inner.add(fieldLabel("Mot de passe"), gbc);
+        gbc.gridx = 1; gbc.insets = new Insets(0, 4, 2, 0);
+        inner.add(fieldLabel("Confirmer"), gbc);
 
-        JButton btn = primaryButton("Creer mon compte");
-        btn.addActionListener(e -> handleInscription());
-        p.add(btn);
-        p.add(Box.createVerticalStrut(10));
+        gbc.gridy = row++;
+        gbc.gridx = 0; gbc.insets = new Insets(0, 0, 18, 4);
+        inner.add(passField, gbc);
+        gbc.gridx = 1; gbc.insets = new Insets(0, 4, 18, 0);
+        inner.add(confirmField, gbc);
 
+        gbc.gridx = 0; gbc.gridwidth = 2; gbc.weightx = 1.0;
+        gbc.gridy = row++; gbc.insets = new Insets(0, 0, 10, 0);
+        JButton btnCreer = primaryButton("Creer mon compte");
+        btnCreer.addActionListener(e -> handleInscription());
+        inner.add(btnCreer, gbc);
+
+        gbc.gridy = row++; gbc.insets = new Insets(0, 0, 0, 0);
         JLabel note = new JLabel("Les comptes responsables sont crees par l'administrateur");
         note.setFont(new Font("SansSerif", Font.PLAIN, 11));
         note.setForeground(GRAY_NOTE);
-        note.setAlignmentX(Component.CENTER_ALIGNMENT);
-        p.add(note);
+        note.setHorizontalAlignment(SwingConstants.CENTER);
+        inner.add(note, gbc);
+
+        gbc.gridy = row; gbc.weighty = 1.0;
+        inner.add(new JLabel(), gbc);
 
         roleCombo.addActionListener(e -> {
             String sel = (String) roleCombo.getSelectedItem();
             roleCardLayout.show(rolePanel, "Etudiant".equals(sel) ? "ETUDIANT" : "ENSEIGNANT");
         });
-        return p;
+
+        GridBagConstraints o = new GridBagConstraints();
+        o.fill = GridBagConstraints.BOTH; o.weighty = 1.0;
+        o.weightx = 0.1; o.gridx = 0;
+        outer.add(new JPanel() {{ setBackground(Color.WHITE); }}, o);
+        o.weightx = 0.8; o.gridx = 1;
+        outer.add(inner, o);
+        o.weightx = 0.1; o.gridx = 2;
+        outer.add(new JPanel() {{ setBackground(Color.WHITE); }}, o);
+
+        return outer;
     }
 
     private JPanel buildEtudiantFields() {
-        JPanel p = vbox();
+        JPanel p = new JPanel(new GridBagLayout());
+        p.setBackground(Color.WHITE);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 0.5; gbc.gridy = 0;
+
         filiereField = textField();
         niveauCombo  = new JComboBox<>(new String[]{"Licence 1","Licence 2","Licence 3","Master 1","Master 2"});
         styleCombo(niveauCombo);
-        p.add(row2(labeled("Filiere", filiereField), labeled("Niveau", niveauCombo)));
-        p.add(Box.createVerticalStrut(14));
-        p.add(fieldLabel("Numero etudiant"));
-        p.add(Box.createVerticalStrut(5));
+
+        gbc.gridx = 0; gbc.insets = new Insets(0, 0, 2, 6);
+        p.add(fieldLabel("Filiere"), gbc);
+        gbc.gridx = 1; gbc.insets = new Insets(0, 6, 2, 0);
+        p.add(fieldLabel("Niveau"), gbc);
+
+        gbc.gridy = 1;
+        gbc.gridx = 0; gbc.insets = new Insets(0, 0, 10, 6);
+        p.add(filiereField, gbc);
+        gbc.gridx = 1; gbc.insets = new Insets(0, 6, 10, 0);
+        p.add(niveauCombo, gbc);
+
+        gbc.gridy = 2; gbc.gridx = 0; gbc.gridwidth = 2; gbc.weightx = 1.0;
+        gbc.insets = new Insets(0, 0, 2, 0);
+        p.add(fieldLabel("Numero etudiant"), gbc);
+
+        gbc.gridy = 3; gbc.insets = new Insets(0, 0, 0, 0);
         numEtudiantField = textField();
-        p.add(numEtudiantField);
+        p.add(numEtudiantField, gbc);
         return p;
     }
 
     private JPanel buildEnseignantFields() {
-        JPanel p = vbox();
-        p.add(fieldLabel("Departement"));
-        p.add(Box.createVerticalStrut(5));
+        JPanel p = new JPanel(new GridBagLayout());
+        p.setBackground(Color.WHITE);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0; gbc.gridx = 0;
+
+        gbc.gridy = 0; gbc.insets = new Insets(0, 0, 2, 0);
+        p.add(fieldLabel("Departement"), gbc);
+        gbc.gridy = 1; gbc.insets = new Insets(0, 0, 10, 0);
         departementField = textField();
-        p.add(departementField);
-        p.add(Box.createVerticalStrut(14));
-        p.add(fieldLabel("Fonction"));
-        p.add(Box.createVerticalStrut(5));
+        p.add(departementField, gbc);
+
+        gbc.gridy = 2; gbc.insets = new Insets(0, 0, 2, 0);
+        p.add(fieldLabel("Fonction"), gbc);
+        gbc.gridy = 3; gbc.insets = new Insets(0, 0, 0, 0);
         fonctionField = textField();
-        p.add(fonctionField);
+        p.add(fonctionField, gbc);
         return p;
     }
 
@@ -307,21 +381,12 @@ public class LoginView extends JFrame {
             "Succes", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // ─── UTILITAIRES ──────────────────────────────────────────────────
-    private JPanel vbox() {
-        JPanel p = new JPanel();
-        p.setBackground(Color.WHITE);
-        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        return p;
-    }
-
     private JTextField textField() {
         JTextField f = new JTextField();
         f.setFont(new Font("SansSerif", Font.PLAIN, 13));
         f.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(GRAY_BORDER, 1),
             BorderFactory.createEmptyBorder(8, 12, 8, 12)));
-        f.setMaximumSize(new Dimension(Integer.MAX_VALUE, 38));
         return f;
     }
 
@@ -331,7 +396,6 @@ public class LoginView extends JFrame {
         f.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(GRAY_BORDER, 1),
             BorderFactory.createEmptyBorder(8, 12, 8, 12)));
-        f.setMaximumSize(new Dimension(Integer.MAX_VALUE, 38));
         return f;
     }
 
@@ -339,6 +403,7 @@ public class LoginView extends JFrame {
         JLabel l = new JLabel(text);
         l.setFont(new Font("SansSerif", Font.PLAIN, 12));
         l.setForeground(GRAY_TEXT);
+        l.setHorizontalAlignment(SwingConstants.LEFT);
         return l;
     }
 
@@ -351,8 +416,7 @@ public class LoginView extends JFrame {
         b.setBorderPainted(false);
         b.setOpaque(true);
         b.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        b.setBorder(BorderFactory.createEmptyBorder(12, 0, 12, 0));
-        b.setMaximumSize(new Dimension(Integer.MAX_VALUE, 44));
+        b.setPreferredSize(new Dimension(0, 44));
         b.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent e) { b.setBackground(new Color(0x0C,0x44,0x7C)); }
             public void mouseExited(java.awt.event.MouseEvent e)  { b.setBackground(BLUE); }
@@ -370,35 +434,26 @@ public class LoginView extends JFrame {
             BorderFactory.createLineBorder(BLUE, 1, true),
             BorderFactory.createEmptyBorder(6, 20, 6, 20)));
         b.setOpaque(true);
-        if (active) { b.setBackground(BLUE);       b.setForeground(Color.WHITE); }
-        else         { b.setBackground(Color.WHITE); b.setForeground(BLUE); }
+        if (active) { b.setBackground(BLUE); b.setForeground(Color.WHITE); }
+        else        { b.setBackground(Color.WHITE); b.setForeground(BLUE); }
         return b;
     }
 
     private void setActiveTab(JButton active, JButton inactive) {
-        active.setBackground(BLUE);        active.setForeground(Color.WHITE);
+        active.setBackground(BLUE);          active.setForeground(Color.WHITE);
         inactive.setBackground(Color.WHITE); inactive.setForeground(BLUE);
     }
 
     private void styleCombo(JComboBox<?> combo) {
         combo.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        combo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 38));
+        combo.setBorder(BorderFactory.createLineBorder(GRAY_BORDER, 1));
     }
 
-    private JPanel labeled(String label, JComponent field) {
-        JPanel p = vbox();
-        p.add(fieldLabel(label));
-        p.add(Box.createVerticalStrut(5));
-        p.add(field);
-        return p;
-    }
-
-    private JPanel row2(JPanel left, JPanel right) {
-        JPanel row = new JPanel(new GridLayout(1, 2, 10, 0));
-        row.setBackground(Color.WHITE);
-        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 65));
-        row.add(left);
-        row.add(right);
-        return row;
+    // TODO: enlever cette methode main quand tout sera fini
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            MainController controller = new MainController();
+            new LoginView(controller).setVisible(true);
+        });
     }
 }
