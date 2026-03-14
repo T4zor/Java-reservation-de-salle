@@ -3,9 +3,12 @@ package view;
 import controller.MainController;
 import javax.swing.*;
 
+@SuppressWarnings("serial")
 public class ReservationStatusView extends JFrame {
+    private static final long serialVersionUID = 1L;
 
-    private MainController controller;
+    @SuppressWarnings("unused")
+    private final MainController controller;
 
     public ReservationStatusView(MainController controller) {
         this.controller = controller;

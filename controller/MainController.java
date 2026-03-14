@@ -1,18 +1,22 @@
 package controller;
 
-import database.DBConnection;
-import model.Reservation;
-import model.Room;
-import model.User;
-import view.*;
-
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import model.DatabaseManager;
+import model.User;
+import view.LoginView;
+import view.RequestProcessingView;
+import view.ReservationRequestView;
+import view.ReservationStatusView;
+import view.RoomManagementView;
 
 public class MainController {
 
-    // ── Session : utilisateur connecté ────────────────────
+    // ── Session : utilisateur connecte ───────────────────
     private User utilisateurConnecte = null;
 
     // =========================================================
@@ -25,10 +29,6 @@ public class MainController {
 
     public void showLoginView() {
         new LoginView(this).setVisible(true);
-    }
-
-    public void showUserManagementView() {
-        new UserManagementView(this).setVisible(true);
     }
 
     public void showReservationRequestView() {
@@ -68,30 +68,26 @@ public class MainController {
     // GESTION DES UTILISATEURS
     // =========================================================
 
-    // Récupérer tous les utilisateurs
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
         String sql = "SELECT * FROM User ORDER BY nom, prenom";
-        try {
-            Statement st = DBConnection.getConnection().createStatement();
-            ResultSet rs = st.executeQuery(sql);
+        try (Statement st = DatabaseManager.getConnection().createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
             while (rs.next()) {
                 users.add(mapUser(rs));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Erreur lors de la récupération des utilisateurs: " + e.getMessage());
         }
         return users;
     }
 
-    // Ajouter un utilisateur
     public boolean ajouterUser(User u) {
         String sql = "INSERT INTO User "
                    + "(nom, prenom, email, role, mot_de_passe) "
                    + "VALUES (?, ?, ?, ?, ?)";
-        try {
-            PreparedStatement ps =
-                DBConnection.getConnection().prepareStatement(sql);
+        try (PreparedStatement ps =
+                DatabaseManager.getConnection().prepareStatement(sql)) {
             ps.setString(1, u.getNom());
             ps.setString(2, u.getPrenom());
             ps.setString(3, u.getEmail());
@@ -99,19 +95,18 @@ public class MainController {
             ps.setString(5, u.getMotDePasse());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Erreur lors de l'ajout de l'utilisateur: " + e.getMessage());
             return false;
         }
     }
 
-    // Modifier un utilisateur
     public boolean modifierUser(User u) {
         String sql = "UPDATE User "
-                   + "SET nom=?, prenom=?, email=?, role=?, mot_de_passe=? "
+                   + "SET nom=?, prenom=?, email=?, "
+                   + "role=?, mot_de_passe=? "
                    + "WHERE id=?";
-        try {
-            PreparedStatement ps =
-                DBConnection.getConnection().prepareStatement(sql);
+        try (PreparedStatement ps =
+                DatabaseManager.getConnection().prepareStatement(sql)) {
             ps.setString(1, u.getNom());
             ps.setString(2, u.getPrenom());
             ps.setString(3, u.getEmail());
@@ -120,61 +115,55 @@ public class MainController {
             ps.setInt(6, u.getId());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Erreur lors de la modification de l'utilisateur: " + e.getMessage());
             return false;
         }
     }
 
-    // Supprimer un utilisateur
     public boolean supprimerUser(int id) {
         String sql = "DELETE FROM User WHERE id = ?";
-        try {
-            PreparedStatement ps =
-                DBConnection.getConnection().prepareStatement(sql);
+        try (PreparedStatement ps =
+                DatabaseManager.getConnection().prepareStatement(sql)) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Erreur lors de la suppression de l'utilisateur: " + e.getMessage());
             return false;
         }
     }
 
-    // Authentification email + mot de passe
     public User authentifier(String email, String motDePasse) {
         String sql = "SELECT * FROM User "
                    + "WHERE email = ? AND mot_de_passe = ?";
-        try {
-            PreparedStatement ps =
-                DBConnection.getConnection().prepareStatement(sql);
+        try (PreparedStatement ps =
+                DatabaseManager.getConnection().prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
             ps.setString(1, email.trim());
             ps.setString(2, motDePasse.trim());
-            ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return mapUser(rs);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Erreur lors de l'authentification: " + e.getMessage());
         }
-        return null; // identifiants incorrects
+        return null;
     }
 
-    // Vérifier si email existe déjà
     public boolean emailExiste(String email) {
         String sql = "SELECT COUNT(*) FROM User WHERE email = ?";
-        try {
-            PreparedStatement ps =
-                DBConnection.getConnection().prepareStatement(sql);
+        try (PreparedStatement ps =
+                DatabaseManager.getConnection().prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
             ps.setString(1, email.trim());
-            ResultSet rs = ps.executeQuery();
             if (rs.next()) return rs.getInt(1) > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Erreur lors de la vérification de l'email: " + e.getMessage());
         }
         return false;
     }
 
     // =========================================================
-    // HELPERS PRIVÉS
+    // HELPER PRIVE
     // =========================================================
 
     private User mapUser(ResultSet rs) throws SQLException {
