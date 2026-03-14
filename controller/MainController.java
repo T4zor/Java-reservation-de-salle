@@ -1,9 +1,21 @@
 package controller;
 
+import model.*;
 import view.*;
+
+import java.sql.SQLException;
 
 public class MainController {
     public void start() {
+        // Test de la connexion BD
+        try {
+            DatabaseManager.getConnection();
+            System.out.println("Connexion à la base de données réussie !");
+        } catch (SQLException e) {
+            System.out.println("Erreur de connexion à la BD : " + e.getMessage());
+            return; // Arrête si la BD ne fonctionne pas
+        }
+
         // Affiche la fenêtre de connexion
         LoginView loginView = new LoginView(this);
         loginView.setVisible(true);
