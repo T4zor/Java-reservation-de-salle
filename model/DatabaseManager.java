@@ -54,6 +54,13 @@ public class DatabaseManager {
             stmt.execute(createUserTable);
             stmt.execute(createSalleTable);
             stmt.execute(createReservationTable);
+
+            // Insérer un utilisateur par défaut si la table est vide
+            String insertDefaultUser = """
+                INSERT OR IGNORE INTO User (nom, prenom, email, role, mot_de_passe)
+                VALUES ('Admin', 'Admin', 'admin@example.com', 'responsable', 'admin');
+            """;
+            stmt.execute(insertDefaultUser);
         } catch (SQLException e) {
             System.out.println("Erreur lors de la création des tables : " + e.getMessage());
         }
