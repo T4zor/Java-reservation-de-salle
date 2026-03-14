@@ -71,8 +71,10 @@ public class MainController {
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
         String sql = "SELECT * FROM User ORDER BY nom, prenom";
-        try (Statement st = DatabaseManager.getConnection().createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
+        try {
+            Statement st =
+                DatabaseManager.getConnection().createStatement();
+            ResultSet rs = st.executeQuery(sql);
             while (rs.next()) {
                 users.add(mapUser(rs));
             }
@@ -86,8 +88,9 @@ public class MainController {
         String sql = "INSERT INTO User "
                    + "(nom, prenom, email, role, mot_de_passe) "
                    + "VALUES (?, ?, ?, ?, ?)";
-        try (PreparedStatement ps =
-                DatabaseManager.getConnection().prepareStatement(sql)) {
+        try {
+            PreparedStatement ps =
+                DatabaseManager.getConnection().prepareStatement(sql);
             ps.setString(1, u.getNom());
             ps.setString(2, u.getPrenom());
             ps.setString(3, u.getEmail());
@@ -105,8 +108,9 @@ public class MainController {
                    + "SET nom=?, prenom=?, email=?, "
                    + "role=?, mot_de_passe=? "
                    + "WHERE id=?";
-        try (PreparedStatement ps =
-                DatabaseManager.getConnection().prepareStatement(sql)) {
+        try {
+            PreparedStatement ps =
+                DatabaseManager.getConnection().prepareStatement(sql);
             ps.setString(1, u.getNom());
             ps.setString(2, u.getPrenom());
             ps.setString(3, u.getEmail());
@@ -122,8 +126,9 @@ public class MainController {
 
     public boolean supprimerUser(int id) {
         String sql = "DELETE FROM User WHERE id = ?";
-        try (PreparedStatement ps =
-                DatabaseManager.getConnection().prepareStatement(sql)) {
+        try {
+            PreparedStatement ps =
+                DatabaseManager.getConnection().prepareStatement(sql);
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -135,11 +140,12 @@ public class MainController {
     public User authentifier(String email, String motDePasse) {
         String sql = "SELECT * FROM User "
                    + "WHERE email = ? AND mot_de_passe = ?";
-        try (PreparedStatement ps =
+        try {
+            PreparedStatement ps =
                 DatabaseManager.getConnection().prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
             ps.setString(1, email.trim());
             ps.setString(2, motDePasse.trim());
+            ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return mapUser(rs);
             }
@@ -151,10 +157,11 @@ public class MainController {
 
     public boolean emailExiste(String email) {
         String sql = "SELECT COUNT(*) FROM User WHERE email = ?";
-        try (PreparedStatement ps =
+        try {
+            PreparedStatement ps =
                 DatabaseManager.getConnection().prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
             ps.setString(1, email.trim());
+            ResultSet rs = ps.executeQuery();
             if (rs.next()) return rs.getInt(1) > 0;
         } catch (SQLException e) {
             System.err.println("Erreur lors de la vérification de l'email: " + e.getMessage());
