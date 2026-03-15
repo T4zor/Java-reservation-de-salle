@@ -1,5 +1,8 @@
 package model;
 
+import java.util.List;
+import java.util.ArrayList;
+
 public class Room {
 
     // ── Attributs — correspondent exactement à la table BD ──
@@ -34,5 +37,87 @@ public class Room {
     @Override
     public String toString() {
         return nom + " (capacité : " + capacite + ")";
+    }
+
+    // ── Méthodes CRUD ─────────────────────────────────────
+    public boolean save() {
+        String sql = "INSERT INTO Salle (nom, capacite, equipements) VALUES (?, ?, ?)";
+        try {
+            var ps = DatabaseManager.getConnection().prepareStatement(sql);
+            ps.setString(1, nom);
+            ps.setInt(2, capacite);
+            ps.setString(3, equipements);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("Erreur save Room : " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean update() {
+        String sql = "UPDATE Salle SET nom = ?, capacite = ?, equipements = ? WHERE id = ?";
+        try {
+            var ps = DatabaseManager.getConnection().prepareStatement(sql);
+            ps.setString(1, nom);
+            ps.setInt(2, capacite);
+            ps.setString(3, equipements);
+            ps.setInt(4, id);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("Erreur update Room : " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean delete() {
+        String sql = "DELETE FROM Salle WHERE id = ?";
+        try {
+            var ps = DatabaseManager.getConnection().prepareStatement(sql);
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.err.println("Erreur delete Room : " + e.getMessage());
+            return false;
+        }
+    }
+
+    public static java.util.List<Room> findAll() {
+        java.util.List<Room> rooms = new java.util.ArrayList<>();
+        String sql = "SELECT * FROM Salle ORDER BY nom";
+        try {
+            var st = DatabaseManager.getConnection().createStatement();
+            var rs = st.executeQuery(sql);
+            while (rs.next()) {
+                Room r = new Room();
+                r.setId(rs.getInt("id"));
+                r.setNom(rs.getString("nom"));
+                r.setCapacite(rs.getInt("capacite"));
+                r.setEquipements(rs.getString("equipements"));
+                rooms.add(r);
+            }
+        } catch (Exception e) {
+            System.err.println("Erreur findAll Room : " + e.getMessage());
+        }
+        return rooms;
+    }
+
+    public static Room findById(int id) {
+        String sql = "SELECT * FROM Salle WHERE id = ?";
+        try {
+            var ps = DatabaseManager.getConnection().prepareStatement(sql);
+            ps.setInt(1, id);
+            var rs = ps.executeQuery();
+            if (rs.next()) {
+                Room r = new Room();
+                r.setId(rs.getInt("id"));
+                r.setNom(rs.getString("nom"));
+                r.setCapacite(rs.getInt("capacite"));
+                r.setEquipements(rs.getString("equipements"));
+                return r;
+            }
+        } catch (Exception e) {
+            System.err.println("Erreur findById Room : " + e.getMessage());
+        }
+        return null;
     }
 }

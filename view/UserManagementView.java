@@ -84,6 +84,7 @@ public class UserManagementView extends JFrame {
             new Font("Segoe UI", Font.BOLD, 12));
         table.setSelectionMode(
             ListSelectionModel.SINGLE_SELECTION);
+        table.setAutoCreateRowSorter(true);
         table.getSelectionModel()
              .addListSelectionListener(
                  e -> remplirFormulaire());
@@ -173,7 +174,7 @@ public class UserManagementView extends JFrame {
             e -> supprimerUser());
         btnRetour.addActionListener(e -> {
             dispose();
-            controller.showLoginView();
+            controller.showMenuPrincipal();
         });
 
         bas.add(btnSupprimer);

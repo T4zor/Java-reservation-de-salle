@@ -45,6 +45,7 @@ public class DatabaseManager {
                 date_debut TEXT NOT NULL,  -- Format YYYY-MM-DD HH:MM
                 date_fin TEXT NOT NULL,
                 statut TEXT NOT NULL DEFAULT 'en attente',  -- 'en attente', 'acceptee', 'refusee'
+                motif TEXT,
                 FOREIGN KEY (id_user) REFERENCES User(id),
                 FOREIGN KEY (id_salle) REFERENCES Salle(id)
             );
@@ -54,6 +55,16 @@ public class DatabaseManager {
             stmt.execute(createUserTable);
             stmt.execute(createSalleTable);
             stmt.execute(createReservationTable);
+
+            // Ajouter la colonne motif si elle n'existe pas (pour compatibilité)
+            try {
+                stmt.execute("ALTER TABLE Reservation ADD COLUMN motif TEXT;");
+            } catch (SQLException e) {
+                // Colonne existe déjà, ignorer l'erreur
+                if (!e.getMessage().contains("duplicate column name")) {
+                    System.out.println("Erreur lors de l'ajout de la colonne motif : " + e.getMessage());
+                }
+            }
 
             // Insérer un utilisateur par défaut si la table est vide
             String insertDefaultUser = """

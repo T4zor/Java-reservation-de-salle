@@ -1,5 +1,7 @@
 package model;
 
+import java.sql.*;
+
 public class User {
 
     // ── Attributs — correspondent exactement à la table BD ──
@@ -50,6 +52,40 @@ public class User {
         return "responsable".equalsIgnoreCase(role);
     }
 
+    // ── Méthodes CRUD ─────────────────────────────────────
+    public void save() throws SQLException {
+        String sql = "INSERT INTO User (nom, prenom, email, role, mot_de_passe) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = DatabaseManager.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, nom);
+            stmt.setString(2, prenom);
+            stmt.setString(3, email);
+            stmt.setString(4, role);
+            stmt.setString(5, motDePasse);
+            stmt.executeUpdate();
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                this.id = rs.getInt(1);
+            }
+        }
+    }
+    public static User findByEmail(String email) throws SQLException {
+        String sql = "SELECT * FROM User WHERE email = ?";
+        try (PreparedStatement stmt = DatabaseManager.getConnection().prepareStatement(sql)) {
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                User user = new User();
+                user.setId(rs.getInt("id"));
+                user.setNom(rs.getString("nom"));
+                user.setPrenom(rs.getString("prenom"));
+                user.setEmail(rs.getString("email"));
+                user.setRole(rs.getString("role"));
+                user.setMotDePasse(rs.getString("mot_de_passe"));
+                return user;
+            }
+        }
+        return null;
+    }
     public boolean isEnseignant() {
         return "enseignant".equalsIgnoreCase(role);
     }

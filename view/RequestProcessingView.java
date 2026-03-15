@@ -65,6 +65,7 @@ public class RequestProcessingView extends JFrame {
             new Font("Segoe UI", Font.BOLD, 12));
         table.setSelectionMode(
             ListSelectionModel.SINGLE_SELECTION);
+        table.setAutoCreateRowSorter(true);
         add(new JScrollPane(table),
             BorderLayout.CENTER);
 
@@ -91,7 +92,7 @@ public class RequestProcessingView extends JFrame {
             e -> traiterDemande("refusee"));
         btnRetour.addActionListener(e -> {
             dispose();
-            controller.showLoginView();
+            controller.showMenuPrincipal();
         });
 
         bas.add(btnAccepter);
