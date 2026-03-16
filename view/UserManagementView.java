@@ -164,6 +164,10 @@ public class UserManagementView extends JFrame {
         form.add(lblInfo);
         form.add(Box.createVerticalStrut(10));
 
+        // Panel pour centrer les boutons
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        buttonPanel.setOpaque(false);
+
         JButton btnAjouter =
             bouton("Ajouter",
                 new Color(39, 174, 96));
@@ -180,11 +184,11 @@ public class UserManagementView extends JFrame {
         btnVider.addActionListener(
             e -> viderFormulaire());
 
-        form.add(btnAjouter);
-        form.add(Box.createVerticalStrut(6));
-        form.add(btnModifier);
-        form.add(Box.createVerticalStrut(6));
-        form.add(btnVider);
+        buttonPanel.add(btnAjouter);
+        buttonPanel.add(btnModifier);
+        buttonPanel.add(btnVider);
+
+        form.add(buttonPanel);
 
         return form;
     }

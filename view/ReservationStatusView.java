@@ -17,6 +17,7 @@ public class ReservationStatusView extends JFrame {
 
     public ReservationStatusView(MainController controller) {
         this.controller = controller;
+        StyleUtils.applyModernStyle(this);
         initializeUI();
     }
 
@@ -29,21 +30,39 @@ public class ReservationStatusView extends JFrame {
         // Layout
         setLayout(new BorderLayout());
 
+        // Titre avec icône
+        JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        titlePanel.setBackground(StyleUtils.BACKGROUND_COLOR);
+        titlePanel.setBorder(BorderFactory.createEmptyBorder(20, 10, 10, 10));
+
+        JLabel iconLabel = StyleUtils.createIconLabel("📋");
+        titlePanel.add(iconLabel);
+
+        JLabel lblTitre = new JLabel("Statut des réservations");
+        StyleUtils.styleTitleLabel(lblTitre);
+        lblTitre.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
+        titlePanel.add(lblTitre);
+
         // Titre et recherche
         JPanel topPanel = new JPanel(new BorderLayout());
-        JLabel lblTitre = new JLabel("Statut des réservations", JLabel.CENTER);
-        lblTitre.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 18));
-        topPanel.add(lblTitre, BorderLayout.NORTH);
+        topPanel.add(titlePanel, BorderLayout.NORTH);
 
-        // Barre de recherche
-        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        // Barre de recherche stylisée
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        searchPanel.setBackground(StyleUtils.BACKGROUND_COLOR);
+        searchPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
         searchPanel.add(new JLabel("Rechercher :"));
-        txtSearch = new JTextField(20);
+        txtSearch = StyleUtils.createStyledTextField();
+        txtSearch.setPreferredSize(new Dimension(200, 30));
         searchPanel.add(txtSearch);
-        JButton btnSearch = new JButton("Rechercher");
+
+        JButton btnSearch = StyleUtils.createStyledButton("Rechercher");
         searchPanel.add(btnSearch);
-        JButton btnClear = new JButton("Effacer");
+
+        JButton btnClear = StyleUtils.createSecondaryButton("Effacer");
         searchPanel.add(btnClear);
+
         topPanel.add(searchPanel, BorderLayout.SOUTH);
 
         add(topPanel, BorderLayout.NORTH);
@@ -85,20 +104,26 @@ public class ReservationStatusView extends JFrame {
             }
         });
 
-        // Boutons
-        JPanel panelBoutons = new JPanel();
-        JButton btnRetour = new JButton("Retour au menu");
+        // Boutons stylisés
+        JPanel panelBoutons = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
+        panelBoutons.setBackground(StyleUtils.BACKGROUND_COLOR);
+        panelBoutons.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
+
+        JButton btnRetour = StyleUtils.createSecondaryButton("Retour au menu");
         btnRetour.addActionListener(e -> {
             dispose();
             controller.showMenuPrincipal();
         });
-        JButton btnDeconnexion = new JButton("Déconnexion");
+
+        JButton btnDeconnexion = StyleUtils.createDangerButton("Déconnexion");
         btnDeconnexion.addActionListener(e -> {
             dispose();
             controller.deconnecter();
         });
+
         panelBoutons.add(btnRetour);
         panelBoutons.add(btnDeconnexion);
+
         add(panelBoutons, BorderLayout.SOUTH);
 
         // Icône

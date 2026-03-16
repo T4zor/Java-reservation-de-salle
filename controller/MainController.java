@@ -12,13 +12,16 @@ import model.LogAction;
 import model.Reservation;
 import model.Room;
 import model.User;
+import view.DashboardView;
 import view.LoginView;
+import view.LogHistoryView;
 import view.MenuEtudiantView;
 import view.MenuResponsableView;
 import view.RequestProcessingView;
 import view.ReservationRequestView;
 import view.ReservationStatusView;
 import view.RoomManagementView;
+import view.StatisticsView;
 import view.UserManagementView;
 
 import javax.swing.*;
@@ -181,12 +184,27 @@ public class MainController {
             .setVisible(true);
     }
 
+    public void showLogHistoryView() {
+        new LogHistoryView(this)
+            .setVisible(true);
+    }
+
+    public void showStatisticsView() {
+        new StatisticsView(this)
+            .setVisible(true);
+    }
+
+    public void showDashboardView() {
+        new DashboardView(this)
+            .setVisible(true);
+    }
+
     public void showMenuResponsableView() {
-        new MenuResponsableView(this).setVisible(true);
+        showDashboardView();
     }
 
     public void showMenuEtudiantView() {
-        new MenuEtudiantView(this).setVisible(true);
+        showDashboardView();
     }
 
     public void showMenuPrincipal() {
@@ -200,11 +218,8 @@ public class MainController {
             return;
         }
 
-        if (utilisateurConnecte.isResponsable()) {
-            ouvrirMenuResponsable(utilisateurConnecte);
-        } else {
-            ouvrirMenuEtudiant(utilisateurConnecte);
-        }
+        // Utiliser le dashboard moderne pour tous les utilisateurs
+        showDashboardView();
     }
 
     private void ouvrirMenuResponsable(User user) {

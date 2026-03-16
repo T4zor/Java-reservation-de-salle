@@ -11,6 +11,9 @@ public class LogAction {
     private String details;
     private LocalDateTime dateAction;
 
+    // ── Champ joint pour l'affichage ────────
+    private String nomUser;
+
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     public LogAction() {}
@@ -37,6 +40,9 @@ public class LogAction {
 
     public LocalDateTime getDateAction() { return dateAction; }
     public void setDateAction(LocalDateTime dateAction) { this.dateAction = dateAction; }
+
+    public String getNomUser() { return nomUser; }
+    public void setNomUser(String nomUser) { this.nomUser = nomUser; }
 
     public String getDateActionFormatee() {
         return dateAction != null ? dateAction.format(FMT) : "";
@@ -71,6 +77,7 @@ public class LogAction {
                 log.setAction(rs.getString("action"));
                 log.setDetails(rs.getString("details"));
                 log.setDateAction(LocalDateTime.parse(rs.getString("date_action"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                log.setNomUser(rs.getString("nom_user") + " " + rs.getString("prenom_user"));
                 logs.add(log);
             }
         } catch (Exception e) {

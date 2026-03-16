@@ -14,12 +14,14 @@ public class MenuResponsableView extends JFrame {
 
     public MenuResponsableView(MainController controller) {
         this.controller = controller;
+        // Appliquer le thème moderne
+        StyleUtils.applyModernStyle(this);
         initializeUI();
     }
 
     private void initializeUI() {
         setTitle("Menu Responsable - Système de Réservation de Salles");
-        setSize(500, 450);
+        setSize(550, 500);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -35,58 +37,65 @@ public class MenuResponsableView extends JFrame {
 
         // Titre
         JLabel lblTitre = new JLabel("Menu Responsable", JLabel.CENTER);
-        lblTitre.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        lblTitre.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
+        StyleUtils.styleTitleLabel(lblTitre);
         add(lblTitre, BorderLayout.NORTH);
 
         // Panel central avec les boutons
-        JPanel panelCentral = new JPanel();
-        panelCentral.setLayout(new GridLayout(0, 1, 10, 10));
-        panelCentral.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
+        JPanel panelCentral = StyleUtils.createCardPanel();
+        panelCentral.setLayout(new GridLayout(0, 1, 15, 15));
 
         // Informations utilisateur
         String userInfo = "Connecté en tant que : " + controller.getUtilisateurConnecte().getNomComplet();
         JLabel lblUser = new JLabel(userInfo, JLabel.CENTER);
-        lblUser.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+        StyleUtils.styleBodyLabel(lblUser);
+        lblUser.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
         panelCentral.add(lblUser);
 
         // Séparateur
         panelCentral.add(new JSeparator());
 
         // Boutons du menu responsable
-        JButton btnGestionUtilisateurs = createStyledButton("Gestion des Utilisateurs");
+        JButton btnGestionUtilisateurs = StyleUtils.createStyledButton("Gestion des Utilisateurs");
         btnGestionUtilisateurs.addActionListener(e -> {
             dispose();
             controller.showUserManagementView();
         });
         panelCentral.add(btnGestionUtilisateurs);
 
-        JButton btnGestionSalles = createStyledButton("Gestion des Salles");
+        JButton btnGestionSalles = StyleUtils.createStyledButton("Gestion des Salles");
         btnGestionSalles.addActionListener(e -> {
             dispose();
             controller.showRoomManagementView();
         });
         panelCentral.add(btnGestionSalles);
 
-        JButton btnTraiterDemandes = createStyledButton("Traiter les Demandes");
+        JButton btnTraiterDemandes = StyleUtils.createStyledButton("Traiter les Demandes");
         btnTraiterDemandes.addActionListener(e -> {
             dispose();
             controller.showRequestProcessingView();
         });
         panelCentral.add(btnTraiterDemandes);
 
-        JButton btnVoirReservations = createStyledButton("Voir Toutes les Réservations");
+        JButton btnVoirReservations = StyleUtils.createStyledButton("Voir Toutes les Réservations");
         btnVoirReservations.addActionListener(e -> {
             dispose();
             controller.showReservationStatusView();
         });
         panelCentral.add(btnVoirReservations);
 
+        JButton btnVoirHistorique = StyleUtils.createStyledButton("Voir l'Historique des Actions");
+        btnVoirHistorique.addActionListener(e -> {
+            dispose();
+            controller.showLogHistoryView();
+        });
+        panelCentral.add(btnVoirHistorique);
+
         add(panelCentral, BorderLayout.CENTER);
 
         // Panel inférieur avec bouton déconnexion
         JPanel panelBas = new JPanel();
-        JButton btnDeconnexion = new JButton("Déconnexion");
+        panelBas.setBackground(StyleUtils.BACKGROUND_COLOR);
+        JButton btnDeconnexion = StyleUtils.createSecondaryButton("Déconnexion");
         btnDeconnexion.addActionListener(e -> {
             dispose();
             controller.deconnecter();
@@ -96,10 +105,6 @@ public class MenuResponsableView extends JFrame {
     }
 
     private JButton createStyledButton(String text) {
-        JButton button = new JButton(text);
-        button.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        button.setPreferredSize(new Dimension(300, 40));
-        button.setFocusPainted(false);
-        return button;
+        return StyleUtils.createStyledButton(text);
     }
 }

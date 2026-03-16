@@ -15,36 +15,18 @@ public class LoginView extends JFrame {
     private JPasswordField txtMotDePasse;
     private JLabel lblMessage;
 
-    // Couleurs
-    private static final Color BLEU
-        = new Color(41, 128, 185);
-    private static final Color BLEU_FONCE
-        = new Color(31, 97, 141);
-    private static final Color VERT
-        = new Color(39, 174, 96);
-    private static final Color ROUGE
-        = new Color(192, 57, 43);
-    private static final Color ORANGE
-        = new Color(243, 156, 18);
-    private static final Color VIOLET
-        = new Color(142, 68, 173);
-    private static final Color GRIS
-        = new Color(52, 73, 94);
-    private static final Color FOND
-        = new Color(245, 246, 250);
-
     // =========================================================
     // CONSTRUCTEUR
     // =========================================================
 
     public LoginView(MainController controller) {
         this.controller = controller;
+        // Appliquer le thème moderne
+        StyleUtils.applyModernStyle(this);
 
-        setTitle("Connexion \u2014 "
-            + "R\u00e9servation de Salles");
+        setTitle("Connexion — Réservation de Salles");
         setSize(440, 560);
-        setDefaultCloseOperation(
-            JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
 
@@ -57,12 +39,9 @@ public class LoginView extends JFrame {
                 "Icone non trouvee.");
         }
 
-        getContentPane()
-            .setBackground(FOND);
-        setLayout(new BorderLayout());
         add(construireHeader(),
             BorderLayout.NORTH);
-        add(construireFormulaire(),
+        add(StyleUtils.createCenteredPanel(construireFormulaire()),
             BorderLayout.CENTER);
         add(construireFooter(),
             BorderLayout.SOUTH);
@@ -77,7 +56,7 @@ public class LoginView extends JFrame {
         header.setLayout(
             new BoxLayout(header,
                 BoxLayout.Y_AXIS));
-        header.setBackground(BLEU);
+        header.setBackground(StyleUtils.PRIMARY_COLOR);
         header.setBorder(
             new EmptyBorder(25, 30, 20, 30));
 
@@ -142,133 +121,79 @@ public class LoginView extends JFrame {
 
     private JPanel construireFormulaire() {
         JPanel panel = new JPanel();
-        panel.setLayout(
-            new BoxLayout(panel,
-                BoxLayout.Y_AXIS));
+        panel.setLayout(new GridBagLayout());
         panel.setBackground(Color.WHITE);
-        panel.setBorder(
-            new EmptyBorder(25, 35, 20, 35));
+        panel.setBorder(new EmptyBorder(25, 35, 20, 35));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.CENTER;
 
         // Email
-        panel.add(creerLabel(
-            "ADRESSE EMAIL"));
-        panel.add(Box.createVerticalStrut(6));
-        txtEmail = new JTextField();
-        styliserChamp(txtEmail,
-            "votre@email.com");
-        panel.add(txtEmail);
-        panel.add(Box.createVerticalStrut(16));
+        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 1;
+        panel.add(creerLabel("ADRESSE EMAIL"), gbc);
+
+        gbc.gridy = 1;
+        txtEmail = StyleUtils.createStyledTextField();
+        txtEmail.setPreferredSize(new Dimension(300, 35));
+        txtEmail.setMaximumSize(new Dimension(300, 35));
+        panel.add(txtEmail, gbc);
 
         // Mot de passe
-        panel.add(creerLabel("MOT DE PASSE"));
-        panel.add(Box.createVerticalStrut(6));
-        txtMotDePasse = new JPasswordField();
-        styliserChamp(txtMotDePasse, null);
-        panel.add(txtMotDePasse);
-        panel.add(Box.createVerticalStrut(12));
+        gbc.gridy = 2;
+        panel.add(creerLabel("MOT DE PASSE"), gbc);
+
+        gbc.gridy = 3;
+        txtMotDePasse = StyleUtils.createStyledPasswordField();
+        txtMotDePasse.setPreferredSize(new Dimension(300, 35));
+        txtMotDePasse.setMaximumSize(new Dimension(300, 35));
+        panel.add(txtMotDePasse, gbc);
 
         // Message erreur/succes
+        gbc.gridy = 4;
         lblMessage = new JLabel(" ");
-        lblMessage.setFont(
-            new Font("Segoe UI",
-                Font.ITALIC, 12));
-        lblMessage.setForeground(ROUGE);
-        lblMessage.setAlignmentX(
-            CENTER_ALIGNMENT);
-        panel.add(lblMessage);
-        panel.add(Box.createVerticalStrut(12));
+        lblMessage.setFont(StyleUtils.SMALL_FONT);
+        lblMessage.setForeground(StyleUtils.ERROR_COLOR);
+        lblMessage.setHorizontalAlignment(SwingConstants.CENTER);
+        panel.add(lblMessage, gbc);
 
         // Bouton connexion
-        JButton btnConnexion =
-            new JButton("Se connecter");
-        btnConnexion.setMaximumSize(
-            new Dimension(
-                Integer.MAX_VALUE, 44));
-        btnConnexion.setBackground(BLEU);
-        btnConnexion.setForeground(
-            Color.WHITE);
-        btnConnexion.setFont(
-            new Font("Segoe UI",
-                Font.BOLD, 14));
-        btnConnexion.setFocusPainted(false);
-        btnConnexion.setBorderPainted(false);
-        btnConnexion.setCursor(
-            new Cursor(Cursor.HAND_CURSOR));
-        btnConnexion.setAlignmentX(
-            LEFT_ALIGNMENT);
-
-        // Hover effect
-        btnConnexion.addMouseListener(
-            new java.awt.event.MouseAdapter() {
-                public void mouseEntered(
-                        java.awt.event.MouseEvent e) {
-                    btnConnexion
-                        .setBackground(
-                            BLEU_FONCE);
-                }
-                public void mouseExited(
-                        java.awt.event.MouseEvent e) {
-                    btnConnexion
-                        .setBackground(BLEU);
-                }
-            });
-
-        panel.add(btnConnexion);
-        panel.add(Box.createVerticalStrut(20));
+        gbc.gridy = 5;
+        JButton btnConnexion = StyleUtils.createStyledButton("Se connecter");
+        btnConnexion.setPreferredSize(new Dimension(300, 44));
+        btnConnexion.setMaximumSize(new Dimension(300, 44));
+        panel.add(btnConnexion, gbc);
 
         // Separateur
+        gbc.gridy = 6;
         JSeparator sep = new JSeparator();
-        sep.setMaximumSize(
-            new Dimension(
-                Integer.MAX_VALUE, 1));
-        sep.setForeground(
-            new Color(220, 220, 220));
-        panel.add(sep);
-        panel.add(Box.createVerticalStrut(15));
+        sep.setPreferredSize(new Dimension(300, 1));
+        sep.setForeground(new Color(220, 220, 220));
+        panel.add(sep, gbc);
 
         // Roles disponibles
-        JLabel lblRoles = new JLabel(
-            "Roles disponibles :");
-        lblRoles.setFont(
-            new Font("Segoe UI",
-                Font.BOLD, 11));
-        lblRoles.setForeground(
-            new Color(100, 100, 100));
-        lblRoles.setAlignmentX(
-            CENTER_ALIGNMENT);
-        panel.add(lblRoles);
-        panel.add(Box.createVerticalStrut(10));
+        gbc.gridy = 7;
+        JLabel lblRoles = new JLabel("Roles disponibles :");
+        lblRoles.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        lblRoles.setForeground(new Color(100, 100, 100));
+        lblRoles.setHorizontalAlignment(SwingConstants.CENTER);
+        panel.add(lblRoles, gbc);
 
         // Badges des roles
-        JPanel badges = new JPanel(
-            new FlowLayout(
-                FlowLayout.CENTER, 6, 0));
+        gbc.gridy = 8;
+        JPanel badges = new JPanel(new FlowLayout(FlowLayout.CENTER, 6, 0));
         badges.setOpaque(false);
-        badges.setMaximumSize(
-            new Dimension(
-                Integer.MAX_VALUE, 30));
-        badges.add(badge(
-            "Etudiant",
-            new Color(230, 241, 251),
-            new Color(12, 68, 124)));
-        badges.add(badge(
-            "Enseignant",
-            new Color(234, 243, 222),
-            new Color(39, 80, 10)));
-        badges.add(badge(
-            "Responsable",
-            new Color(250, 238, 218),
-            new Color(99, 56, 6)));
-        panel.add(badges);
+        badges.setPreferredSize(new Dimension(300, 30));
+        badges.add(badge("Etudiant", new Color(230, 241, 251), new Color(12, 68, 124)));
+        badges.add(badge("Enseignant", new Color(234, 243, 222), new Color(39, 80, 10)));
+        badges.add(badge("Responsable", new Color(250, 238, 218), new Color(99, 56, 6)));
+        panel.add(badges, gbc);
 
         // Actions
-        btnConnexion.addActionListener(
-            e -> seConnecter());
-        txtMotDePasse.addActionListener(
-            e -> seConnecter());
-        txtEmail.addActionListener(
-            e -> txtMotDePasse
-                .requestFocus());
+        btnConnexion.addActionListener(e -> seConnecter());
+        txtMotDePasse.addActionListener(e -> seConnecter());
+        txtEmail.addActionListener(e -> txtMotDePasse.requestFocus());
 
         return panel;
     }
@@ -281,7 +206,7 @@ public class LoginView extends JFrame {
         JPanel footer = new JPanel(
             new FlowLayout(
                 FlowLayout.CENTER));
-        footer.setBackground(FOND);
+        footer.setBackground(StyleUtils.BACKGROUND_COLOR);
         footer.setBorder(
             new EmptyBorder(8, 0, 8, 0));
 
@@ -345,147 +270,10 @@ public class LoginView extends JFrame {
     private void ouvrirMenuSelonRole(
             User user) {
         if (user.isResponsable()) {
-            ouvrirMenuResponsable(user);
-        } else if (user.isEnseignant()) {
-            ouvrirMenuEnseignant(user);
+            controller.showMenuResponsableView();
         } else {
-            ouvrirMenuEtudiant(user);
+            controller.showMenuEtudiantView();
         }
-    }
-
-    private void ouvrirMenuResponsable(
-            User user) {
-        JFrame menu = creerFenetreMenu(
-            "Menu Responsable \u2014 "
-            + user.getNomComplet(),
-            420, 430);
-
-        JPanel panel = creerPanelMenu(
-            user, "Responsable", ORANGE);
-
-        ajouterBouton(panel,
-            "Demande de r\u00e9servation",
-            BLEU, e -> {
-                menu.dispose();
-                controller
-                    .showReservationRequestView();
-            });
-        ajouterBouton(panel,
-            "Statut des r\u00e9servations",
-            VERT, e -> {
-                menu.dispose();
-                controller
-                    .showReservationStatusView();
-            });
-        ajouterBouton(panel,
-            "Gestion des salles",
-            VIOLET, e -> {
-                menu.dispose();
-                controller
-                    .showRoomManagementView();
-            });
-        ajouterBouton(panel,
-            "Traitement des demandes",
-            ORANGE, e -> {
-                menu.dispose();
-                controller
-                    .showRequestProcessingView();
-            });
-        ajouterBouton(panel,
-            "Gestion des utilisateurs",
-            GRIS, e -> {
-                menu.dispose();
-                controller
-                    .showUserManagementView();
-            });
-        ajouterBouton(panel,
-            "Se d\u00e9connecter",
-            ROUGE, e -> {
-                menu.dispose();
-                controller
-                    .setUtilisateurConnecte(
-                        null);
-                controller.showLoginView();
-            });
-
-        menu.add(panel);
-        menu.setVisible(true);
-    }
-
-    private void ouvrirMenuEnseignant(
-            User user) {
-        JFrame menu = creerFenetreMenu(
-            "Menu Enseignant \u2014 "
-            + user.getNomComplet(),
-            420, 290);
-
-        JPanel panel = creerPanelMenu(
-            user, "Enseignant", VERT);
-
-        ajouterBouton(panel,
-            "Demande de r\u00e9servation",
-            BLEU, e -> {
-                menu.dispose();
-                controller
-                    .showReservationRequestView();
-            });
-        ajouterBouton(panel,
-            "Statut des r\u00e9servations",
-            VERT, e -> {
-                menu.dispose();
-                controller
-                    .showReservationStatusView();
-            });
-        ajouterBouton(panel,
-            "Se d\u00e9connecter",
-            ROUGE, e -> {
-                menu.dispose();
-                controller
-                    .setUtilisateurConnecte(
-                        null);
-                controller.showLoginView();
-            });
-
-        menu.add(panel);
-        menu.setVisible(true);
-    }
-
-    private void ouvrirMenuEtudiant(
-            User user) {
-        JFrame menu = creerFenetreMenu(
-            "Menu Etudiant \u2014 "
-            + user.getNomComplet(),
-            420, 290);
-
-        JPanel panel = creerPanelMenu(
-            user, "Etudiant", BLEU);
-
-        ajouterBouton(panel,
-            "Demande de r\u00e9servation",
-            BLEU, e -> {
-                menu.dispose();
-                controller
-                    .showReservationRequestView();
-            });
-        ajouterBouton(panel,
-            "Statut de mes r\u00e9servations",
-            VERT, e -> {
-                menu.dispose();
-                controller
-                    .showReservationStatusView();
-            });
-        ajouterBouton(panel,
-            "Se d\u00e9connecter",
-            ROUGE, e -> {
-                menu.dispose();
-                controller
-                    .setUtilisateurConnecte(
-                        null);
-                controller.showLoginView();
-            });
-
-        menu.add(panel);
-        menu.setVisible(true);
     }
 
     // =========================================================
@@ -643,13 +431,13 @@ public class LoginView extends JFrame {
 
     private void afficherErreur(
             String msg) {
-        lblMessage.setForeground(ROUGE);
+        lblMessage.setForeground(StyleUtils.ERROR_COLOR);
         lblMessage.setText(msg);
     }
 
     private void afficherSucces(
             String msg) {
-        lblMessage.setForeground(VERT);
+        lblMessage.setForeground(StyleUtils.SUCCESS_COLOR);
         lblMessage.setText(msg);
     }
 }

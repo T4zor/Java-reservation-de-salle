@@ -14,12 +14,14 @@ public class MenuEtudiantView extends JFrame {
 
     public MenuEtudiantView(MainController controller) {
         this.controller = controller;
+        // Appliquer le thème moderne
+        StyleUtils.applyModernStyle(this);
         initializeUI();
     }
 
     private void initializeUI() {
         setTitle("Menu Étudiant - Système de Réservation de Salles");
-        setSize(500, 350);
+        setSize(550, 400);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -35,33 +37,32 @@ public class MenuEtudiantView extends JFrame {
 
         // Titre
         JLabel lblTitre = new JLabel("Menu Étudiant", JLabel.CENTER);
-        lblTitre.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        lblTitre.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
+        StyleUtils.styleTitleLabel(lblTitre);
         add(lblTitre, BorderLayout.NORTH);
 
         // Panel central avec les boutons
-        JPanel panelCentral = new JPanel();
-        panelCentral.setLayout(new GridLayout(0, 1, 10, 10));
-        panelCentral.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
+        JPanel panelCentral = StyleUtils.createCardPanel();
+        panelCentral.setLayout(new GridLayout(0, 1, 15, 15));
 
         // Informations utilisateur
         String userInfo = "Connecté en tant que : " + controller.getUtilisateurConnecte().getNomComplet();
         JLabel lblUser = new JLabel(userInfo, JLabel.CENTER);
-        lblUser.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+        StyleUtils.styleBodyLabel(lblUser);
+        lblUser.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
         panelCentral.add(lblUser);
 
         // Séparateur
         panelCentral.add(new JSeparator());
 
         // Boutons pour les étudiants
-        JButton btnFaireReservation = createStyledButton("Faire une demande de réservation");
+        JButton btnFaireReservation = StyleUtils.createStyledButton("Faire une demande de réservation");
         btnFaireReservation.addActionListener(e -> {
             dispose();
             controller.showReservationRequestView();
         });
         panelCentral.add(btnFaireReservation);
 
-        JButton btnVoirReservations = createStyledButton("Voir mes réservations");
+        JButton btnVoirReservations = StyleUtils.createStyledButton("Voir mes réservations");
         btnVoirReservations.addActionListener(e -> {
             dispose();
             controller.showReservationStatusView();
@@ -72,7 +73,8 @@ public class MenuEtudiantView extends JFrame {
 
         // Panel inférieur avec bouton déconnexion
         JPanel panelBas = new JPanel();
-        JButton btnDeconnexion = new JButton("Déconnexion");
+        panelBas.setBackground(StyleUtils.BACKGROUND_COLOR);
+        JButton btnDeconnexion = StyleUtils.createSecondaryButton("Déconnexion");
         btnDeconnexion.addActionListener(e -> {
             dispose();
             controller.deconnecter();
@@ -82,10 +84,6 @@ public class MenuEtudiantView extends JFrame {
     }
 
     private JButton createStyledButton(String text) {
-        JButton button = new JButton(text);
-        button.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        button.setPreferredSize(new Dimension(300, 40));
-        button.setFocusPainted(false);
-        return button;
+        return StyleUtils.createStyledButton(text);
     }
 }
